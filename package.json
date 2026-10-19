@@ -1,7 +1,7 @@
 {
   "name": "wavedrop",
   "productName": "WaveDrop",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Condivisione file in stile AirDrop, in sovraimpressione, per Windows, macOS e Linux",
   "main": "src/main.js",
   "author": "Matteo Davanzo",
