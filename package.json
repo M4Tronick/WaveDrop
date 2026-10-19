@@ -63,7 +63,8 @@
   "devDependencies": {
     "electron": "^44.9.0",
     "electron-builder": "^26.15.3",
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "jsqr": "^1.4.0"
   },
   "dependencies": {
     "@noble/ciphers": "^2.4.0",

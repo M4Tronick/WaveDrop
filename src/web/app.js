@@ -4,6 +4,7 @@
 // with; all file contents are sealed end to end with the shared protocol.
 
 const P = require('../shared/protocol.js');
+const jsQR = require('jsqr');
 
 const STORE_KEY = 'wavedrop.phone.v2';
 const app = document.getElementById('app');
@@ -14,6 +15,10 @@ const PLATFORM = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.plat
     ? 'android'
     : 'phone';
 const DEFAULT_NAME = PLATFORM === 'ios' ? 'iPhone' : PLATFORM === 'android' ? 'Telefono Android' : 'Telefono';
+// Opened from the Home Screen icon. On iOS that app has its own storage, apart
+// from Safari's, and starts at /m/ without the one-time secret: it must be
+// linked from inside, by photographing the QR code.
+const STANDALONE = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 const PLATFORM_LABEL = { win32: 'PC Windows', darwin: 'Mac', linux: 'Linux' };
 
 const ICONS = {
@@ -72,6 +77,46 @@ const mimeOf = (name) => MIME[name.split('.').pop().toLowerCase()] || 'applicati
 
 function fromB64url(s) {
   return P.unb64(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+}
+
+// A pairing link (also wrapped as wavedrop://pair?u=…) → its #k/#p parameters.
+function pairingLink(text) {
+  try {
+    let url = new URL(String(text).trim());
+    if (url.protocol === 'wavedrop:') url = new URL(url.searchParams.get('u'));
+    const params = new URLSearchParams(url.hash.slice(1));
+    return params.get('k') && params.get('p') ? { url, params } : null;
+  } catch {
+    return null;
+  }
+}
+
+// The text of the QR code in a photo or screenshot, or null. Photos of a
+// screen are big and moiré-prone, so it tries a few sizes.
+async function readQr(file) {
+  const src = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Non riesco ad aprire questa immagine.'));
+      i.src = src;
+    });
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    for (const side of [1000, 700, 1600]) {
+      const scale = Math.min(1, side / Math.max(img.naturalWidth, img.naturalHeight));
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const found = jsQR(data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
+      if (found) return found.data;
+    }
+    return null;
+  } finally {
+    URL.revokeObjectURL(src);
+  }
 }
 
 const isUrl = (s) => /^https?:\/\/\S+$/i.test(s.trim());
@@ -169,18 +214,53 @@ document.addEventListener('visibilitychange', () => {
 // ───────────── UI: screens ─────────────
 
 function screenNoLink() {
+  const error = h('div', { class: 'error', hidden: true });
+  const picker = h('input', { type: 'file', accept: 'image/*', hidden: true });
+  const button = h('button', { class: 'btn primary wide' }, 'Fotografa il codice QR');
+  button.addEventListener('click', () => picker.click());
+  picker.addEventListener('change', async () => {
+    const file = picker.files[0];
+    picker.value = '';
+    if (!file) return;
+    button.disabled = true;
+    button.textContent = 'Lettura del codice…';
+    error.hidden = true;
+    try {
+      const text = await readQr(file);
+      const link = text && pairingLink(text);
+      if (!link) throw new Error('Non trovo un codice QR di WaveDrop in questa foto. Avvicinati allo schermo e riprova.');
+      if (link.url.origin !== location.origin) {
+        throw new Error(`Questo codice è di un PC con un altro indirizzo (${link.url.host}). Apri ${link.url.origin}/m/ nel browser e aggiungi quella pagina alla schermata Home.`);
+      }
+      screenPair(link.params, link.url.href);
+    } catch (err) {
+      error.textContent = err.message;
+      error.hidden = false;
+      button.disabled = false;
+      button.textContent = 'Fotografa il codice QR';
+    }
+  });
   app.replaceChildren(
     h(
       'div',
       { class: 'hero' },
       h('img', { src: 'icon.png', alt: '' }),
       h('h1', {}, 'Collega questo telefono'),
-      h('p', {}, 'Sul PC apri WaveDrop, scegli «Collega telefono» e inquadra il codice QR con la fotocamera.'),
+      h(
+        'p',
+        {},
+        STANDALONE
+          ? 'Sul PC apri WaveDrop e scegli «Collega un telefono». Poi tocca qui sotto e fai una foto al codice QR, oppure scegli uno screenshot che lo contiene.'
+          : 'Sul PC apri WaveDrop, scegli «Collega un telefono» e inquadra il codice QR con la fotocamera. Oppure fai una foto al codice:',
+      ),
+      button,
+      picker,
+      error,
     ),
   );
 }
 
-function screenPair(params) {
+function screenPair(params, link = location.href) {
   const input = h('input', { class: 'field', value: DEFAULT_NAME, maxlength: '40', autocomplete: 'off' });
   const error = h('div', { class: 'error', hidden: true });
   const button = h('button', { class: 'btn primary wide' }, 'Collega');
@@ -198,7 +278,6 @@ function screenPair(params) {
     }
   });
   // With the native app installed, hand the same one-time link to it instead.
-  const link = location.href;
   const appHref =
     PLATFORM === 'android'
       ? `intent://pair?u=${encodeURIComponent(link)}#Intent;scheme=wavedrop;package=app.wavedrop.android;end`
@@ -223,6 +302,13 @@ function screenPair(params) {
       button,
       error,
       openApp,
+      PLATFORM === 'ios' && !STANDALONE
+        ? h(
+            'p',
+            { class: 'footnote' },
+            "Vuoi WaveDrop come app nella schermata Home? Aggiungila adesso (Condividi → «Aggiungi alla schermata Home»), aprila dall'icona e fotografa questo stesso codice QR: l'icona non vede i collegamenti fatti in Safari.",
+          )
+        : null,
     ),
   );
 }
@@ -254,9 +340,11 @@ function screenMain() {
     save();
   });
 
-  const tip =
-    PLATFORM === 'ios'
-      ? 'Per averlo come app: tocca Condividi, poi «Aggiungi alla schermata Home». Le immagini ricevute si salvano in Foto tenendole premute.'
+  const saveTip = 'Le immagini ricevute si salvano in Foto tenendole premute.';
+  const tip = STANDALONE
+    ? PLATFORM === 'ios' ? saveTip : null
+    : PLATFORM === 'ios'
+      ? `Per averlo come app: Condividi → «Aggiungi alla schermata Home», poi apri l'icona e collegala fotografando un nuovo codice QR (l'app della Home non vede i collegamenti fatti in Safari). ${saveTip}`
       : 'Per averlo come app: menu ⋮ del browser, poi «Aggiungi a schermata Home».';
 
   app.replaceChildren(
@@ -274,7 +362,7 @@ function screenMain() {
       h('div', { class: 'row' }, h('span', { class: 'grow' }, 'Codice del PC'), h('span', { class: 'value' }, P.safetyCode(P.unb64(state.desktop.pk)))),
     ),
     h('p', { class: 'footnote' }, 'I file viaggiano cifrati end-to-end (X25519 + ChaCha20-Poly1305): solo questo telefono e il PC possono leggerli. I codici di sicurezza devono coincidere con quelli mostrati nelle impostazioni di WaveDrop sul PC.'),
-    h('p', { class: 'footnote' }, tip),
+    tip ? h('p', { class: 'footnote' }, tip) : null,
     h('div', { class: 'btns' }, h('button', { class: 'btn danger wide', onclick: unlink }, 'Scollega dal PC')),
   );
   pcName.textContent = state.desktop.name;

@@ -172,7 +172,7 @@ WaveDrop non esisterebbe senza chi ha studiato AirDrop e ha condiviso il proprio
 - [OpenDrop](https://github.com/seemoo-lab/opendrop) e [OWL](https://github.com/seemoo-lab/owl) del Secure Mobile Networking Lab (SEEMOO) della TU Darmstadt, che hanno ricostruito AirDrop e AWDL;
 - [omdrop-owl](https://github.com/t4t5/omdrop-owl) di t4t5 e [omdrop-plugin](https://github.com/netmojo-systems/omdrop-plugin) di netmojo-systems, usati dal ponte AirDrop su Linux;
 - [xtool](https://github.com/xtool-org/xtool), che permette di compilare l'app iPhone senza un Mac;
-- le librerie open source delle tre app: Electron, noble (Paul Miller), node-qrcode, OkHttp, Bouncy Castle, ZXing Android Embedded, Jetpack Compose, swift-crypto.
+- le librerie open source delle tre app: Electron, noble (Paul Miller), node-qrcode, jsQR, OkHttp, Bouncy Castle, ZXing Android Embedded, Jetpack Compose, swift-crypto.
 
 L'elenco completo, con le licenze, è in [CREDITS.md](CREDITS.md). Nessuno di questi progetti è incluso nel repository: WaveDrop usa le librerie come dipendenze e avvia OpenDrop/omdrop come programmi esterni.
 

@@ -28,6 +28,7 @@ propria licenza. Gli articoli di riferimento sono quelli di Milan Stute e colleg
 | [Electron](https://github.com/electron/electron) | MIT |
 | [noble-curves](https://github.com/paulmillr/noble-curves), [noble-ciphers](https://github.com/paulmillr/noble-ciphers), [noble-hashes](https://github.com/paulmillr/noble-hashes) di Paul Miller | MIT |
 | [node-qrcode](https://github.com/soldair/node-qrcode) | MIT |
+| [jsQR](https://github.com/cozmo/jsQR) (lettura del QR nell'app web per telefoni) | Apache-2.0 |
 | [esbuild](https://github.com/evanw/esbuild) | MIT |
 | [electron-builder](https://github.com/electron-userland/electron-builder) | MIT |
 
