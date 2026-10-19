@@ -72,4 +72,4 @@ Con un Apple ID gratuito l'app scade dopo **7 giorni**: per rinnovarla basta ril
 3. Invia foto, file o testi. Per ricevere, tieni l'app aperta: iOS sospende le app in background.
 
 ## Perché non AirDrop vero
-AirDrop usa AWDL, una rete Wi-Fi diretta tra dispositivi Apple, oltre al Bluetooth LE e a certificati firmati da Apple. iOS non permette ad altre app di usarlo. OpenDrop e omdrop-owl lo reimplementano, ma solo su **Linux** con una scheda Wi-Fi in modalità monitor; il tuo Intel AC 9560 è tra quelle compatibili con omdrop-owl. Su Windows, su WSL e dentro un'app Android o iOS non è possibile.
+AirDrop usa AWDL, una rete Wi-Fi diretta tra dispositivi Apple, oltre al Bluetooth LE e a certificati firmati da Apple. iOS non permette ad altre app di usarlo. OpenDrop e omdrop-owl lo reimplementano, ma solo su **Linux** con una scheda Wi-Fi in modalità monitor (WaveDrop su Linux ha un ponte verso AirDrop: vedi il README principale). Su Windows, su WSL e dentro un'app Android o iOS non è possibile.

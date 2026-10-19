@@ -10,6 +10,7 @@ const CHANNELS = new Set([
   'settings',
   'toasts',
   'island:mode',
+  'island:activity',
   'contacts',
   'history',
   'phone:paired',

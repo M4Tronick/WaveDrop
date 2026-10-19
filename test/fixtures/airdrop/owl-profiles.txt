@@ -2,5 +2,5 @@
 # driver   status    mode    mon_mac  reconnect  mt76_pm  notes
 mt7925e    tested    shared  station  yes        yes      MediaTek MT7925.
 mt76x2u    tested    active-monitor  station  no  no       MediaTek MT7612U USB.
-iwlwifi    tested    exclusive  station  no       no       Intel AX200, AX201, AX211, BE200 and Wireless-AC 9560.
+iwlwifi    tested    exclusive  station  no       no       Intel AX200, AX201, AX211, BE200 and others.
 *          untested  shared  station  yes        no       Any other card.

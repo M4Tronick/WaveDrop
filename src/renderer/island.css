@@ -11,16 +11,21 @@
   transform: translateY(var(--lift, 0px));
 }
 
+/* Idle: a small dark pill with a light rim, so it reads on light and dark
+   title bars alike; it never moves or blinks by itself. */
 #cap {
   position: absolute;
   left: 50%;
-  top: 3px;
-  width: 96px;
-  height: 6px;
-  border-radius: 3px;
+  top: 4px;
+  width: 124px;
+  height: 8px;
+  border-radius: 4px;
   transform: translateX(-50%);
-  background: rgba(24, 24, 27, 0.7);
-  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(180deg, rgba(58, 58, 62, 0.92), rgba(22, 22, 24, 0.92));
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.55),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.18),
+    0 1px 6px rgba(0, 0, 0, 0.3);
   color: #fff;
   overflow: hidden;
   transition:
@@ -28,10 +33,37 @@
     height 0.34s var(--spring),
     border-radius 0.34s var(--spring),
     top 0.34s var(--spring),
-    background 0.2s;
+    background 0.2s,
+    box-shadow 0.3s;
+}
+body[data-mode="idle"]:hover #cap { box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.8), 0 1px 8px rgba(0, 0, 0, 0.35); }
+
+/* Files moving: the pill widens a little and fills with the transfer. */
+#cap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--progress, 0) * 100%);
+  background: linear-gradient(90deg, #0a84ff, #5ac8fa);
+  opacity: 0;
+  transition: width 0.3s ease, opacity 0.25s;
+}
+body.busy[data-mode="idle"] #cap { width: 150px; }
+body.busy[data-mode="idle"] #cap::after { opacity: 1; }
+
+/* A transfer just ended: a short green (done) or red (failed) flash. */
+body[data-mode="idle"][data-flash="ok"] #cap { background: #30d158; box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.6), 0 0 12px rgba(48, 209, 88, 0.55); }
+body[data-mode="idle"][data-flash="bad"] #cap { background: #ff453a; box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 69, 58, 0.5); }
+body[data-flash] #cap::after { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  #cap, #cap::after { transition: none; }
 }
 body[data-mode="hover"] #cap {
   top: 4px;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.3), 0 6px 18px rgba(0, 0, 0, 0.35);
   width: 214px;
   height: 30px;
   border-radius: 15px;

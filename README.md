@@ -1,6 +1,19 @@
-# WaveDrop
+<p align="center">
+  <img src="assets/icon.png" width="128" height="128" alt="Icona di WaveDrop">
+</p>
 
-_di **Matteo Davanzo** · licenza [MIT](LICENSE) · [github.com/M4Tronick/WaveDrop](https://github.com/M4Tronick/WaveDrop)_
+<h1 align="center">WaveDrop</h1>
+
+<p align="center">
+  Condivisione file in stile AirDrop per Windows, Linux, Android e iPhone, cifrata end-to-end.<br>
+  <sub>di <b>Matteo Davanzo</b> · licenza <a href="LICENSE">MIT</a></sub>
+</p>
+
+<p align="center">
+  <a href="https://github.com/M4Tronick/WaveDrop/releases/latest"><img alt="Ultima versione" src="https://img.shields.io/github/v/release/M4Tronick/WaveDrop?label=versione&color=0a84ff"></a>
+  <a href="https://github.com/M4Tronick/WaveDrop/releases/latest"><img alt="Scarica" src="https://img.shields.io/badge/scarica-Windows%20·%20Linux%20·%20Android-34c759"></a>
+  <a href="LICENSE"><img alt="Licenza MIT" src="https://img.shields.io/badge/licenza-MIT-8e8e93"></a>
+</p>
 
 Condivisione di file in stile AirDrop per Windows (funziona anche su macOS e Linux), con un'interfaccia in sovraimpressione. Ha un'app nativa per **Android** (Kotlin), una per **iPhone** (SwiftUI, compilata da Windows con xtool) e un'app web che funziona su qualsiasi telefono. Tutto è **cifrato end-to-end** e la prima volta si verifica l'altro dispositivo con un **codice a 6 cifre**.
 
@@ -117,7 +130,7 @@ AirDrop usa una rete Wi-Fi diretta tra dispositivi Apple (AWDL), un segnale Blue
 - [omdrop-owl](https://github.com/t4t5/omdrop-owl), basato su OWL.
 
 Entrambi funzionano solo su **Linux** (o macOS), con una scheda Wi-Fi che supporta la modalità monitor e l'iniezione di pacchetti, e solo verso iPhone impostati su «Tutti per 10 minuti».
-- **Questo PC:** l'Intel Wireless-AC 9560 è nell'elenco delle schede funzionanti di omdrop-owl, in modalità esclusiva (il Wi-Fi si scollega mentre il PC è visibile). Funzionerebbe però solo avviando **Linux**.
+- **Quali schede:** omdrop-owl tiene un [elenco delle schede provate](https://github.com/t4t5/omdrop-owl). Molte, comprese le Intel più diffuse, funzionano in *modalità esclusiva*: il Wi-Fi si scollega mentre il PC è visibile ad AirDrop.
 - **Windows e WSL:** non c'è accesso diretto alla scheda Wi-Fi, quindi non è possibile.
 - **App Android o iOS:** nessuna app può usare AWDL. L'unica eccezione è Quick Share sui Pixel 10, che Google ha integrato nel sistema operativo.
 
@@ -129,9 +142,9 @@ Con il PC avviato in Linux, WaveDrop può scambiare file con iPhone, iPad e Mac 
 
 Su **Windows** (e su macOS) la funzione non esiste: l'interruttore non compare e WaveDrop si comporta come prima.
 
-### Provarlo su questo portatile
+### Come provarlo
 
-La scheda **Intel Wireless-AC 9560** di questo PC (driver `iwlwifi`) è nell'elenco delle schede funzionanti di omdrop-owl, in **modalità esclusiva**.
+Prima controlla che la scheda Wi-Fi del PC sia nell'elenco di omdrop-owl (`lspci -k` mostra il driver in uso, per esempio `iwlwifi` per le Intel). Poi:
 
 1. **Avvia Linux.** Le prove di omdrop-owl sono su Arch/Omarchy, ma ci sono pacchetti anche per Debian/Ubuntu, Fedora e NixOS. Serve Python 3.11 o successivo; con Python 3.10 installa anche `python3-tomli`.
 2. **Installa omdrop-owl** (la radio):
@@ -161,7 +174,7 @@ Sotto i dispositivi, nell'overlay, la riga *AirDrop* mostra quanto resta della f
 
 ### Limiti del ponte
 
-- **Wi-Fi scollegato in modalità esclusiva.** Su questo portatile (Intel `iwlwifi`) il Wi-Fi si spegne finché il PC è visibile ad AirDrop: niente Internet e niente dispositivi WaveDrop in rete per quei minuti. Per questo WaveDrop non si rende mai visibile da solo all'avvio: solo quando accendi l'interruttore o premi *Rendi visibile*. Con le schede Intel AWDL gira solo sul canale 6, quindi è lento (circa 17 secondi per una foto da 2,4 MB secondo omdrop-owl).
+- **Wi-Fi scollegato in modalità esclusiva.** Con le schede in modalità esclusiva (per esempio le Intel `iwlwifi`) il Wi-Fi si spegne finché il PC è visibile ad AirDrop: niente Internet e niente dispositivi WaveDrop in rete per quei minuti. Per questo WaveDrop non si rende mai visibile da solo all'avvio: solo quando accendi l'interruttore o premi *Rendi visibile*. Con le schede Intel AWDL gira solo sul canale 6, quindi è lento (circa 17 secondi per una foto da 2,4 MB secondo omdrop-owl).
 - **I dispositivi Apple devono essere su «Tutti per 10 minuti».** Senza un'identità firmata da Apple, che omdrop non sa ottenere, il PC usa un certificato autofirmato e non può inviare a chi ha AirDrop su *Solo contatti*.
 - **Si vedono solo i dispositivi che rispondono con il nome**, cioè quelli con AirDrop aperto. Gli iPhone ascoltano a intermittenza: se un invio non parte, apri un foglio di condivisione sull'iPhone e riprova.
 - **Ricezione senza conferma.** Finché il PC è visibile, il ricevitore di omdrop accetta tutto quello che arriva (come AirDrop su *Tutti*): non c'è il pulsante *Rifiuta*, e le opzioni *Chiedi ogni volta dove salvare* e *Una sottocartella per ogni mittente* non valgono per AirDrop.

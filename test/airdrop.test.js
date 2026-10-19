@@ -196,7 +196,7 @@ test('OpenDrop find', () => {
 
 // ───────── Wi-Fi mode ─────────
 
-test('owl-profiles: Intel iwlwifi (the AC 9560) runs exclusive, unknown cards fall back to "*"', () => {
+test('owl-profiles: Intel iwlwifi runs exclusive, unknown cards fall back to "*"', () => {
   const table = fixture('owl-profiles.txt');
   assert.equal(A.owlProfileFor('iwlwifi', [table]).mode, 'exclusive');
   assert.equal(A.owlProfileFor('mt76x2u', [table]).mode, 'active-monitor');

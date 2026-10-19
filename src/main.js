@@ -51,7 +51,7 @@ const HOTKEYS =
 const VISIBILITIES = ['everyone', 'contacts', 'off'];
 const TOAST_WIDTH = 400;
 const ISLAND_SIZES = {
-  idle: { width: 150, height: 12 },
+  idle: { width: 170, height: 16 },
   hover: { width: 230, height: 40 },
   open: { width: 680, height: 250 },
 };
@@ -653,6 +653,7 @@ function onPairing(p) {
 }
 
 function onIncomingUpdate(entry) {
+  pushIslandActivity(ACTIVE.has(entry.status) ? null : entry.status);
   if (entry.status === 'done' && !entry.afterDone) {
     entry.afterDone = true;
     afterReceive(entry);
@@ -718,8 +719,35 @@ async function onAirDropReceived({ sender, paths, links }) {
   if (!link) afterReceiveView(view);
 }
 
+// What the idle island shows: a thin progress line while files move, and a
+// short flash when a transfer ends (green done, red failed; nothing for a
+// decline or a cancel, which the user already knows about).
+function pushIslandActivity(ended) {
+  if (!island || island.isDestroyed()) return;
+  let done = 0;
+  let total = 0;
+  let count = 0;
+  for (const t of transfers.outgoing.values()) {
+    if (t.status === 'sending') {
+      count++;
+      done += t.sent || 0;
+      total += t.total || 0;
+    }
+  }
+  for (const e of transfers.incoming.values()) {
+    if (e.status === 'receiving') {
+      count++;
+      done += e.received || 0;
+      total += e.totalSize || 0;
+    }
+  }
+  const flash = ended === 'done' ? 'ok' : ended && !/declined|cancel/.test(ended) ? 'bad' : null;
+  island.webContents.send('island:activity', { active: count > 0, progress: total ? done / total : 0, flash });
+}
+
 function onOutgoingUpdate(t) {
   broadcast('outgoing', transfers.listOutgoing());
+  pushIslandActivity(ACTIVE.has(t.status) ? null : t.status);
   // The code has to be typed somewhere: bring the overlay up for it.
   if (t.status === 'pairing' && !overlay.isVisible()) openOverlay();
   // While the overlay is hidden, sends (e.g. dropped on the island) report through toasts.
