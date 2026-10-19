@@ -37,7 +37,7 @@ In **Impostazioni → Contatti** puoi:
 
 | | Come si installa | Cosa fa in più dell'app web |
 | --- | --- | --- |
-| **Android** | `dist\WaveDrop-Android-1.0.0.apk` (sorgenti in [`android/`](android)) | Compare nel menu **Condividi** di Android; salva in Galleria e in Download; con *Resta raggiungibile* riceve anche con l'app chiusa |
+| **Android** | APK nelle [release](https://github.com/M4Tronick/WaveDrop/releases/latest) (sorgenti in [`android/`](android)) | Compare nel menu **Condividi** di Android; salva in Galleria e in Download; con *Resta raggiungibile* riceve anche con l'app chiusa |
 | **iPhone** | Compilata da Windows con xtool: vedi [`ios/README.md`](ios/README.md) | Scanner QR integrato; salva in Foto e in File › WaveDrop; chiave privata nel Portachiavi |
 | **App web** | Nessuna installazione: Condividi → *Aggiungi alla schermata Home* (iPhone) o menu ⋮ → *Aggiungi a schermata Home* (Android) | — |
 
@@ -61,8 +61,8 @@ Dal telefono puoi inviare foto, file e testi al PC e accettare quello che il PC 
 npm install
 npm start            # compila l'app web per telefoni e avvia WaveDrop
 npm run start:2      # seconda istanza indipendente, per provare sullo stesso PC
-npm run dist         # dist/WaveDrop Setup 1.0.0.exe (installer) e dist/WaveDrop 1.0.0.exe (portatile)
-npm run dist:linux   # dist/WaveDrop-1.0.0.AppImage (da eseguire su Linux)
+npm run dist         # dist/WaveDrop Setup <versione>.exe (installer) e dist/WaveDrop <versione>.exe (portatile)
+npm run dist:linux   # dist/WaveDrop-<versione>.AppImage (da eseguire su Linux)
 npm run build:ble    # ricompila l'helper Bluetooth (assets/ble-helper.exe)
 npm test             # test dell'adattatore AirDrop sugli output di esempio (test/fixtures/airdrop)
 node scripts/make-vectors.js > android/app/src/test/resources/vectors.json   # vettori di test per le app native

@@ -85,7 +85,7 @@ enum About {
     static let author = "Matteo Davanzo"
     /// The project's GitHub page.
     static let repo = URL(string: "https://github.com/M4Tronick/WaveDrop")
-    static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0" }
+    static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.1" }
 
     struct Credit { let name, by, what: String; let url: URL }
     static let credits = [
