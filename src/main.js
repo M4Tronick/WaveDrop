@@ -15,6 +15,7 @@ const {
   dialog,
   clipboard,
   safeStorage,
+  Notification,
 } = require('electron');
 const fs = require('fs');
 const os = require('os');
@@ -30,6 +31,7 @@ const { MobileHub, lanAddress } = require('./core/mobile');
 const { Ble, beaconHex } = require('./core/ble');
 const { AirDropBridge } = require('./core/airdrop');
 const { isInside, sanitizeRelPath } = require('./core/files');
+const { Updater } = require('./core/updater');
 
 // `--instance=2` runs a second, independent copy (own settings and identity)
 // so two "devices" can be tried on one PC.
@@ -63,6 +65,7 @@ let transfers;
 let mobile;
 let ble;
 let airdrop = null; // Linux only: the bridge to Apple's AirDrop (core/airdrop.js)
+let updater = null; // new versions from the GitHub releases (core/updater.js)
 let tray;
 let overlay;
 let toast;
@@ -202,6 +205,8 @@ async function init() {
     if (airdropOn()) airdrop.refresh();
   }
 
+  startUpdater();
+
   createOverlay();
   createToast();
   createIsland();
@@ -213,12 +218,48 @@ async function init() {
 }
 
 app.on('before-quit', () => {
+  updater?.stop();
   transfers?.stop();
   discovery?.stop();
   ble?.stop();
   airdrop?.shutdown();
 });
 app.on('will-quit', () => globalShortcut.unregisterAll());
+
+// ───────────── updates ─────────────
+
+function startUpdater() {
+  const repo = REPO_URL && REPO_URL.replace(/^https:\/\/github\.com\//, '');
+  if (!repo) return;
+  updater = new Updater({
+    repo,
+    // WAVEDROP_PRETEND_VERSION lets a test build believe it is older.
+    version: process.env.WAVEDROP_PRETEND_VERSION || app.getVersion(),
+    packaged: app.isPackaged,
+    enabled: () => settings.get('autoUpdate'),
+    openUrl: (url) => shell.openExternal(url),
+    quit: () => app.quit(),
+  });
+  updater.on('change', (v) => {
+    broadcast('update', v);
+    refreshTrayMenu();
+  });
+  updater.on('available', notifyUpdate);
+  updater.start();
+}
+
+// One system notification per new version; the tray and Settings keep offering it.
+function notifyUpdate(v) {
+  if (settings.get('notifiedUpdate') === v.latest || !Notification.isSupported()) return;
+  settings.set({ notifiedUpdate: v.latest });
+  const n = new Notification({
+    title: `WaveDrop ${v.latest} è disponibile`,
+    body: 'Clicca per vedere le novità e aggiornare.',
+    icon: path.join(ASSETS, 'icon.png'),
+  });
+  n.on('click', () => openSettings('informazioni'));
+  n.show();
+}
 
 function defaultDisplayName() {
   const user = (os.userInfo().username || 'Utente').replace(/[._-]+/g, ' ').trim();
@@ -768,7 +809,7 @@ function cleanPatch(patch = {}) {
   if (['system', 'light', 'dark'].includes(patch.theme)) out.theme = patch.theme;
   if (HOTKEYS.includes(patch.hotkey)) out.hotkey = patch.hotkey;
   if (Number.isInteger(patch.color) && patch.color >= 0 && patch.color < 8) out.color = patch.color;
-  ['askWhere', 'senderFolders', 'autoAcceptTrusted', 'sound', 'island', 'bluetooth', 'loginItem', 'sendTo'].forEach(bool);
+  ['askWhere', 'senderFolders', 'autoAcceptTrusted', 'sound', 'island', 'bluetooth', 'loginItem', 'sendTo', 'autoUpdate'].forEach(bool);
   if (airdrop) bool('airdrop');
   return out;
 }
@@ -882,6 +923,9 @@ function refreshTrayMenu() {
       { label: 'Apri cartella ricevuti', click: openSaveDir },
       { label: 'Impostazioni…', click: () => openSettings() },
       { label: 'Informazioni su WaveDrop', click: () => openSettings('informazioni') },
+      ...(updater && ['available', 'downloading', 'installing'].includes(updater.state.status)
+        ? [{ label: `Aggiorna a WaveDrop ${updater.state.latest}…`, click: () => openSettings('informazioni') }]
+        : []),
       { type: 'separator' },
       { label: 'Esci', click: () => app.quit() },
     ]),
@@ -1049,7 +1093,10 @@ const settingsSnapshot = () => ({
   history: history.items,
   peers: peerViews(),
   about: { version: app.getVersion(), author: AUTHOR, repo: REPO_URL, electron: process.versions.electron },
+  update: updater ? updater.view() : null,
 });
+ipcMain.handle('update:check', () => updater?.check() ?? null);
+ipcMain.handle('update:install', () => updater?.update() ?? null);
 ipcMain.handle('settings:set', (_e, patch) => {
   const clean = cleanPatch(patch);
   if (Object.keys(clean).length) applySettings(clean);

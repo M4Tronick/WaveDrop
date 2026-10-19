@@ -25,6 +25,7 @@ class Settings {
       sound: true,
       island: true,
       bluetooth: true,
+      autoUpdate: true, // check the GitHub releases for new versions
       theme: 'system', // system | light | dark
       hotkey: process.platform === 'darwin' ? 'Command+Shift+Option+D' : 'Control+Alt+D',
       ...defaults,

@@ -104,7 +104,7 @@
             <li>Collega il telefono alla stessa rete Wi-Fi di questo PC.</li>
             <li>Nell'app <b>WaveDrop</b> (Android o iPhone) tocca <b>Scansiona il codice QR</b>, oppure inquadra il codice con la <b>Fotocamera</b> e tocca il link.</li>
             <li>Scegli un nome per il telefono e tocca <b>Collega</b>.</li>
-            <li>Per averlo come app: su iPhone <b>Condividi → Aggiungi alla schermata Home</b>, poi apri l'icona e tocca <b>Fotografa il codice QR</b>, su Android menu ⋮ → <b>Aggiungi a schermata Home</b>.</li>
+            <li>Per averlo come app: su iPhone <b>Condividi → Aggiungi alla schermata Home</b>: l'icona resta collegata, su Android menu ⋮ → <b>Aggiungi a schermata Home</b>.</li>
           </ol>
           <div class="phone-buttons"><button class="btn" id="qr-new">Nuovo codice</button><span class="hint" id="qr-expiry"></span></div>
         </div>
@@ -191,6 +191,19 @@
         <div class="row"><span class="grow">Autore</span><span class="value">Matteo Davanzo</span></div>
         <div class="row"><span class="grow">Licenza</span><span class="value">MIT · © 2026 Matteo Davanzo</span></div>
         <button class="row link" id="about-repo" hidden><span class="grow">Codice sorgente su GitHub</span><span class="value" id="about-repo-url"></span></button>
+      </div>
+      <div id="update-box" hidden>
+        <h2>Aggiornamenti</h2>
+        <div class="group">
+          <div class="row">
+            <span class="grow"><span id="update-title"></span><span class="hint" id="update-detail"></span></span>
+            <button class="btn" id="update-check">Controlla ora</button>
+            <button class="btn primary" id="update-install" hidden>Aggiorna</button>
+          </div>
+          <div class="row" id="update-progress-row" hidden><div class="progress"><div id="update-progress"></div></div></div>
+          <details class="row" id="update-notes-row" hidden><summary>Novità della versione</summary><div id="update-notes"></div></details>
+          <label class="row"><span class="grow">Controlla automaticamente<span class="hint">All'avvio e ogni 6 ore, sulle release del progetto su GitHub.</span></span><input type="checkbox" class="switch" data-key="autoUpdate"></label>
+        </div>
       </div>
       <h2>Ringraziamenti</h2>
       <p class="note top">WaveDrop esiste grazie a chi ha studiato AirDrop e ha reso pubblici i propri strumenti. Grazie!</p>

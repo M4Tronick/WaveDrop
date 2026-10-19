@@ -316,6 +316,45 @@ function renderAbout(about) {
 }
 for (const b of $$('button[data-url], #about-repo')) b.addEventListener('click', () => wave.openUrl(b.dataset.url));
 
+// ───────── updates ─────────
+
+const UPDATE_KIND = {
+  installer: 'Il nuovo installer viene scaricato, verificato e installato; poi WaveDrop si riapre.',
+  portable: 'La nuova versione portatile viene salvata accanto a questa e avviata.',
+  appimage: "L'AppImage viene sostituita con la nuova e riavviata.",
+  source: 'Stai usando i sorgenti: si apre la pagina della release.',
+  other: 'Si apre la pagina della release da cui scaricarla.',
+};
+
+function renderUpdate(u) {
+  $('#update-box').hidden = !u;
+  if (!u) return;
+  const busy = ['checking', 'downloading', 'installing'].includes(u.status);
+  const title = {
+    idle: `Versione ${u.version}`,
+    checking: 'Controllo in corso…',
+    latest: `WaveDrop ${u.version} è la versione più recente`,
+    available: `È disponibile WaveDrop ${u.latest}`,
+    downloading: `Download di WaveDrop ${u.latest}… ${Math.round(u.progress * 100)}%`,
+    installing: `Installazione di WaveDrop ${u.latest}…`,
+    error: 'Controllo non riuscito',
+  }[u.status];
+  $('#update-title').textContent = title || '';
+  $('#update-detail').textContent =
+    u.error || (u.status === 'available' ? `Hai la ${u.version}. ${UPDATE_KIND[u.kind] || ''}` : u.checkedAt ? `Ultimo controllo ${ago(u.checkedAt)}` : '');
+  $('#update-check').hidden = u.status === 'available' || busy;
+  $('#update-install').hidden = u.status !== 'available';
+  $('#update-install').textContent = ['source', 'other'].includes(u.kind) ? 'Apri la release' : 'Scarica e installa';
+  $('#update-progress-row').hidden = u.status !== 'downloading';
+  $('#update-progress').style.width = `${Math.round(u.progress * 100)}%`;
+  $('#update-notes-row').hidden = !(u.notes && ['available', 'downloading'].includes(u.status));
+  $('#update-notes').textContent = u.notes || '';
+}
+
+$('#update-check').addEventListener('click', () => wave.checkUpdate());
+$('#update-install').addEventListener('click', () => wave.installUpdate());
+wave.on('update', renderUpdate);
+
 // ───────── live data ─────────
 
 wave.on('settings', renderSettings);
@@ -334,5 +373,6 @@ wave.getSettings().then((data) => {
   renderHistory(data.history);
   renderNearby(data.peers);
   renderAbout(data.about);
+  renderUpdate(data.update);
   showSection(location.hash.slice(1) || 'profilo');
 });

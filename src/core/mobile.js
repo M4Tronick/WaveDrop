@@ -11,6 +11,8 @@
 //   POST /m/answer      phone accepts/declines an offer (sealed answer)
 //   GET  /m/chunk       phone pulls sealed chunks of an accepted offer
 //   POST /m/cancel      phone aborts a download
+//   POST /m/home        phone stores its sealed identity (Home Screen box)
+//   POST /m/home/get    a Home Screen app fetches that box back by id
 // Phone → PC transfers use the regular /Ask + /Chunk endpoints.
 
 const fs = require('fs');
@@ -25,6 +27,7 @@ const { reply, readJson, sealChunk, codeError } = require('./transfer');
 const QR_TTL_MS = 5 * 60_000;
 const OFFER_TTL_MS = 2 * 60_000;
 const EVENTS_SKEW_MS = 5 * 60_000;
+const HOME_BOX_MAX = 8 * 1024; // base64 characters
 
 const STATIC = {
   '/m/': ['index.html', 'text/html; charset=utf-8'],
@@ -135,6 +138,10 @@ class MobileHub extends EventEmitter {
         return this._chunk(res, url.searchParams);
       case 'POST /m/cancel':
         return this._cancel(req, res);
+      case 'POST /m/home':
+        return this._homePut(req, res);
+      case 'POST /m/home/get':
+        return this._homeGet(req, res);
       default:
         return reply(res, 404);
     }
@@ -246,6 +253,43 @@ class MobileHub extends EventEmitter {
         this.emit('change');
       }
     });
+  }
+
+  // ───────────── Home Screen box ─────────────
+
+  // The phone (signed with its link key) leaves its identity here, sealed
+  // under a key we never see. One box per phone; a newer one replaces it.
+  async _homePut(req, res) {
+    const body = await readJson(req);
+    const contact = typeof body.id === 'string' ? this.contacts.get(body.id) : null;
+    const t = Number(body.t);
+    if (!contact || contact.kind !== 'phone' || !Number.isFinite(t) || Math.abs(Date.now() - t) > EVENTS_SKEW_MS) {
+      return reply(res, 401);
+    }
+    const box = String(body.box || '');
+    const blob = String(body.blob || '');
+    if (!/^[0-9a-f]{32}$/.test(box) || !blob || blob.length > HOME_BOX_MAX) return reply(res, 400);
+    let sig;
+    try {
+      sig = P.unb64(String(body.sig || ''));
+    } catch {
+      return reply(res, 401);
+    }
+    const expected = P.mac(this.contacts.keysFor(contact.id).link, P.lv('wd-home', String(t), box, blob));
+    if (!P.sameBytes(expected, sig)) return reply(res, 401);
+    this.contacts.update(contact.id, { home: { box, blob } });
+    reply(res, 200);
+  }
+
+  // Anyone holding the box id (derived from the key in the saved address)
+  // gets the sealed box; without the key it is useless.
+  async _homeGet(req, res) {
+    const body = await readJson(req);
+    const box = String(body.box || '');
+    if (!/^[0-9a-f]{32}$/.test(box)) return reply(res, 400);
+    const contact = this.contacts.list().find((c) => c.kind === 'phone' && c.home && c.home.box === box);
+    if (!contact) return reply(res, 404);
+    reply(res, 200, { blob: contact.home.blob });
   }
 
   // ───────────── PC → phone ─────────────

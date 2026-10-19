@@ -16,8 +16,8 @@ const PLATFORM = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.plat
     : 'phone';
 const DEFAULT_NAME = PLATFORM === 'ios' ? 'iPhone' : PLATFORM === 'android' ? 'Telefono Android' : 'Telefono';
 // Opened from the Home Screen icon. On iOS that app has its own storage, apart
-// from Safari's, and starts at /m/ without the one-time secret: it must be
-// linked from inside, by photographing the QR code.
+// from Safari's: it recovers the pairing from the Home Screen box (the key is
+// in the saved address), or is linked from inside by photographing the QR.
 const STANDALONE = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 const PLATFORM_LABEL = { win32: 'PC Windows', darwin: 'Mac', linux: 'Linux' };
 
@@ -74,6 +74,8 @@ const MIME = {
   pdf: 'application/pdf', txt: 'text/plain', zip: 'application/zip',
 };
 const mimeOf = (name) => MIME[name.split('.').pop().toLowerCase()] || 'application/octet-stream';
+
+const toB64url = (bytes) => P.b64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
 function fromB64url(s) {
   return P.unb64(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
@@ -174,6 +176,73 @@ async function pair(params, name) {
   save();
 }
 
+// ───────────── Home Screen box ─────────────
+// Saving the page to the Home Screen saves its address. After pairing, the
+// address carries a key (#h=…, never sent over the network) and the PC keeps
+// this phone's identity sealed under it, so the Home Screen app — which on iOS
+// does not share Safari's storage — becomes the same device without pairing
+// again. Only the PC that paired can hand the box back, and removing the phone
+// there revokes it.
+
+function homeKey() {
+  if (!state.home) {
+    state.home = P.b64(P.randomBytes(32));
+    save();
+  }
+  return P.unb64(state.home);
+}
+
+function markHomeUrl() {
+  if (!state) return;
+  const want = `#h=${toB64url(homeKey())}`;
+  if (location.hash !== want) history.replaceState(null, '', location.pathname + want);
+}
+
+async function syncHome() {
+  const key = homeKey();
+  const box = P.homeBoxId(key);
+  const blob = P.homeSeal(key, { sk: P.b64(state.sk), pk: P.b64(state.pk), id: state.id, name: state.name, desktop: state.desktop });
+  const t = Date.now();
+  const link = P.pairKey(state.sk, state.pk, P.unb64(state.desktop.pk), 'link');
+  const sig = P.b64(P.mac(link, P.lv('wd-home', String(t), box, blob)));
+  try {
+    const res = await fetch('/m/home', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: state.id, t, box, blob, sig }),
+    });
+    if (res.ok) {
+      state.homeName = state.name;
+      save();
+    }
+  } catch {
+    // Offline: retried at the next connection.
+  }
+}
+
+// 'gone' when the PC no longer knows this box (phone removed), null when the
+// PC cannot be reached.
+async function restoreHome(key) {
+  let res;
+  try {
+    res = await fetch('/m/home/get', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ box: P.homeBoxId(key) }),
+    });
+  } catch {
+    return null;
+  }
+  if (res.status === 404) return 'gone';
+  if (!res.ok) return null;
+  try {
+    const s = P.homeOpen(key, (await res.json()).blob);
+    return { ...s, sk: P.unb64(s.sk), pk: P.unb64(s.pk), home: P.b64(key), homeName: s.name };
+  } catch {
+    return 'gone';
+  }
+}
+
 // ───────────── live connection ─────────────
 
 function connect() {
@@ -190,6 +259,7 @@ function connect() {
       save();
     }
     setOnline(true);
+    if (state.homeName !== state.name) syncHome();
   });
   events.addEventListener('offer', (e) => onOffer(JSON.parse(e.data)));
   events.addEventListener('cancel', (e) => offerCards.get(JSON.parse(e.data).offer)?.remoteCancel());
@@ -213,8 +283,8 @@ document.addEventListener('visibilitychange', () => {
 
 // ───────────── UI: screens ─────────────
 
-function screenNoLink() {
-  const error = h('div', { class: 'error', hidden: true });
+function screenNoLink(notice) {
+  const error = h('div', { class: 'error', hidden: !notice }, notice || '');
   const picker = h('input', { type: 'file', accept: 'image/*', hidden: true });
   const button = h('button', { class: 'btn primary wide' }, 'Fotografa il codice QR');
   button.addEventListener('click', () => picker.click());
@@ -269,7 +339,8 @@ function screenPair(params, link = location.href) {
     error.hidden = true;
     try {
       await pair(params, input.value.trim() || DEFAULT_NAME);
-      history.replaceState(null, '', location.pathname); // drop the one-time secret
+      markHomeUrl(); // replaces the one-time secret with the Home Screen key
+      syncHome();
       screenMain();
     } catch (err) {
       error.textContent = err.message;
@@ -302,13 +373,6 @@ function screenPair(params, link = location.href) {
       button,
       error,
       openApp,
-      PLATFORM === 'ios' && !STANDALONE
-        ? h(
-            'p',
-            { class: 'footnote' },
-            "Vuoi WaveDrop come app nella schermata Home? Aggiungila adesso (Condividi → «Aggiungi alla schermata Home»), aprila dall'icona e fotografa questo stesso codice QR: l'icona non vede i collegamenti fatti in Safari.",
-          )
-        : null,
     ),
   );
 }
@@ -318,6 +382,7 @@ let actionsEl;
 let listEl;
 
 function screenMain() {
+  markHomeUrl();
   const pcName = h('div', { class: 'name' });
   statusEl = h('div', { class: 'status' }, h('span', { class: 'dot' }), h('span', { class: 'label' }));
   const picker = h('input', { type: 'file', multiple: true, hidden: true });
@@ -338,14 +403,15 @@ function screenMain() {
     state.name = nameInput.value.trim() || DEFAULT_NAME;
     nameInput.value = state.name;
     save();
+    syncHome();
   });
 
   const saveTip = 'Le immagini ricevute si salvano in Foto tenendole premute.';
   const tip = STANDALONE
     ? PLATFORM === 'ios' ? saveTip : null
     : PLATFORM === 'ios'
-      ? `Per averlo come app: Condividi → «Aggiungi alla schermata Home», poi apri l'icona e collegala fotografando un nuovo codice QR (l'app della Home non vede i collegamenti fatti in Safari). ${saveTip}`
-      : 'Per averlo come app: menu ⋮ del browser, poi «Aggiungi a schermata Home».';
+      ? `Per averlo come app: Condividi → «Aggiungi alla schermata Home». L'icona resta collegata a questo PC. ${saveTip}`
+      : 'Per averlo come app: menu ⋮ del browser, poi «Aggiungi a schermata Home». Resta collegato a questo PC.';
 
   app.replaceChildren(
     h('div', { class: 'large-title' }, h('img', { src: 'icon.png', alt: '' }), 'WaveDrop'),
@@ -388,6 +454,7 @@ function unlink() {
   events?.close();
   localStorage.removeItem(STORE_KEY);
   state = null;
+  history.replaceState(null, '', location.pathname);
   screenNoLink();
 }
 
@@ -688,7 +755,46 @@ async function download(offer, key, files, total, card, abort) {
 
 // ───────────── start ─────────────
 
+async function screenRestore(key) {
+  app.replaceChildren(
+    h('div', { class: 'hero' }, h('img', { src: 'icon.png', alt: '' }), h('h1', {}, 'WaveDrop'), h('p', {}, 'Ripristino del collegamento con il PC…')),
+  );
+  const restored = await restoreHome(key);
+  if (restored && restored !== 'gone') {
+    state = restored;
+    save();
+    return screenMain();
+  }
+  if (restored === 'gone') {
+    history.replaceState(null, '', location.pathname);
+    return screenNoLink('Questo telefono è stato scollegato dal PC. Collegalo di nuovo con un nuovo codice QR.');
+  }
+  const retry = h('button', { class: 'btn primary wide' }, 'Riprova');
+  retry.addEventListener('click', () => screenRestore(key));
+  app.replaceChildren(
+    h(
+      'div',
+      { class: 'hero' },
+      h('img', { src: 'icon.png', alt: '' }),
+      h('h1', {}, 'PC non raggiungibile'),
+      h('p', {}, 'Accendi il PC con WaveDrop e collega il telefono alla stessa rete Wi-Fi, poi riprova.'),
+      retry,
+    ),
+  );
+}
+
+// Android installs from the manifest. iOS must not see it: with a manifest it
+// could save start_url instead of this address, losing the Home Screen key.
+if (PLATFORM !== 'ios') document.head.append(h('link', { rel: 'manifest', href: 'manifest.webmanifest' }));
+
 const params = new URLSearchParams(location.hash.slice(1));
 if (params.get('k') && params.get('p')) screenPair(params);
 else if (state) screenMain();
-else screenNoLink();
+else if (params.get('h')) {
+  let key = null;
+  try {
+    key = fromB64url(params.get('h'));
+  } catch {}
+  if (key && key.length === 32) screenRestore(key);
+  else screenNoLink();
+} else screenNoLink();

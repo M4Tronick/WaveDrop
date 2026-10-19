@@ -14,6 +14,7 @@ const CHANNELS = new Set([
   'history',
   'phone:paired',
   'settings:section',
+  'update',
 ]);
 const invoke = (channel) => (...args) => ipcRenderer.invoke(channel, ...args);
 
@@ -57,6 +58,8 @@ contextBridge.exposeInMainWorld('wave', {
   airdropRefresh: invoke('airdrop:refresh'),
   resetIdentity: invoke('identity:reset'),
   openSettings: invoke('open-settings'),
+  checkUpdate: invoke('update:check'),
+  installUpdate: invoke('update:install'),
 
   // windows
   openOverlay: () => ipcRenderer.send('overlay:open'),

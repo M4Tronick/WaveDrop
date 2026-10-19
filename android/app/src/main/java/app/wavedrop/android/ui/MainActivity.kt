@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         wave.hub.attach("activity")
         ReachableService.sync(this)
+        wave.updater.checkIfDue()
     }
 
     override fun onStop() {
@@ -189,6 +190,7 @@ private fun WaveDropScreen(hub: Hub, incomingLink: MutableStateFlow<String?>) {
                         }
                     }
                 }
+                item { UpdateBanner(context.wave.updater) }
                 if (state.pcs.isEmpty()) {
                     item { Onboarding(pairing, onScan = startScan, onPaste = { pasteDialog = true }) }
                 } else {
@@ -408,6 +410,8 @@ private fun SettingsScreen(hub: Hub, pcs: List<PcState>, onBack: () -> Unit, onA
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 14.dp),
             )
         }
+        item { SectionTitle("Aggiornamenti") }
+        item { UpdateSettings(context.wave.updater) }
         aboutItems()
     }
 

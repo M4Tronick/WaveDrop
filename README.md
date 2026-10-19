@@ -43,6 +43,8 @@ In **Impostazioni → Contatti** puoi:
 
 Dal telefono puoi inviare foto, file e testi al PC e accettare quello che il PC ti manda. Le immagini ricevute si salvano in Foto tenendole premute.
 
+**App web nella schermata Home, senza ricollegarla.** Dopo il collegamento l'indirizzo della pagina contiene una chiave (`#h=…`). La chiave sta dopo il `#`, quindi il telefono non la invia mai in rete. Il PC conserva l'identità del telefono cifrata con quella chiave, senza poterla leggere. Quando apri l'icona della schermata Home, la pagina recupera quella copia e torna lo stesso dispositivo, con lo stesso nome e lo stesso identificativo interno, senza QR. Serve perché su iPhone l'icona ha una memoria separata da Safari. Se rimuovi il telefono nelle Impostazioni del PC, anche l'icona viene scollegata. Se l'icona è stata aggiunta prima di collegarsi, nella pagina c'è **Fotografa il codice QR**.
+
 ### Impostazioni
 - **Profilo:** foto o iniziali colorate, nome, codice di sicurezza.
 - **Ricezione:**
@@ -54,6 +56,21 @@ Dal telefono puoi inviare foto, file e testi al PC e accettare quello che il PC 
   - suono di notifica.
 - **Generale:** avvio con Windows, isola in alto, «Invia a», scorciatoia, tema, Bluetooth; su Linux anche il **ponte AirDrop** (vedi sotto).
 - **Cronologia** dei trasferimenti e **Sicurezza** (dettagli della cifratura, rigenerazione delle chiavi).
+- **Informazioni:** autore, licenza, ringraziamenti e **aggiornamenti** (vedi sotto).
+
+### Aggiornamenti
+WaveDrop controlla l'ultima [release su GitHub](https://github.com/M4Tronick/WaveDrop/releases) all'avvio e poi ogni 6 ore. Il controllo automatico si può spegnere in Impostazioni → Informazioni. Se trova una versione nuova, mostra una notifica, una voce nel menu della barra delle applicazioni e il pulsante **Scarica e installa**. Il file scaricato viene confrontato con `SHA256SUMS.txt` della release; se non corrisponde, viene scartato.
+
+| Installazione | Cosa succede |
+| --- | --- |
+| Windows, installer | il nuovo `WaveDrop-Setup-*.exe` si installa in silenzio sopra quello attuale e riapre WaveDrop |
+| Windows, portatile | il nuovo `WaveDrop-*-portable.exe` viene salvato accanto a quello attuale e avviato |
+| Linux, AppImage | il file AppImage viene sostituito con il nuovo e riavviato |
+| Android | l'APK viene scaricato e passato all'installer di Android: la prima volta chiede di consentire le installazioni da WaveDrop |
+| iPhone | avvisa soltanto: l'app installata con xtool va ricompilata dai sorgenti nuovi |
+| App web | si aggiorna da sola insieme al PC che la serve |
+
+Perché l'aggiornamento funzioni, ogni release deve contenere `WaveDrop-Setup-<versione>.exe`, `WaveDrop-<versione>-portable.exe`, `WaveDrop-<versione>.AppImage`, `WaveDrop-Android-<versione>.apk` e `SHA256SUMS.txt`, con un tag `v<versione>`. L'APK va firmato sempre con la stessa chiave, altrimenti Android rifiuta di installarlo sopra quello vecchio.
 
 ## Avvio e build
 

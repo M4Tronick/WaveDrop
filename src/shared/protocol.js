@@ -234,6 +234,27 @@ const chunkCount = (size) => Math.max(1, Math.ceil(size / CHUNK_SIZE));
 
 const qrProof = (secret, label, a, b) => b64(mac(secret, lv(label, a, b)));
 
+// ───────────── Home Screen box ─────────────
+// A phone's web-app identity, sealed under a key that lives only in the
+// address saved to its Home Screen (after the #, so never sent). The PC keeps
+// the sealed copy and hands it back by id: an iPhone Home Screen app, whose
+// storage is separate from Safari's, recovers the same identity without
+// pairing again. Removing the phone on the PC deletes the box.
+
+const HOME_INFO = 'wavedrop home box v1';
+const homeBoxId = (key) => bytesToHex(sha256(lv('wd-home-id', key))).slice(0, 32);
+
+function homeSeal(key, value) {
+  const salt = randomBytes(16);
+  return b64(concatBytes(salt, seal(kdf(key, salt, HOME_INFO), ZERO_NONCE, te(JSON.stringify(value)), te('wd-home'))));
+}
+
+function homeOpen(key, data) {
+  const raw = unb64(data);
+  const salt = raw.subarray(0, 16);
+  return JSON.parse(td.decode(open(kdf(key, salt, HOME_INFO), ZERO_NONCE, raw.subarray(16), te('wd-home'))));
+}
+
 module.exports = {
   VERSION,
   CHUNK_SIZE,
@@ -266,4 +287,7 @@ module.exports = {
   openChunk,
   chunkCount,
   qrProof,
+  homeBoxId,
+  homeSeal,
+  homeOpen,
 };

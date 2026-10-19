@@ -203,3 +203,10 @@ select option { background: var(--group); color: var(--text); }
 button.row { width: 100%; border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 button.row:hover { background: var(--btn); }
 button.row b { font-weight: 600; }
+
+.progress { flex: 1; height: 6px; border-radius: 3px; background: var(--btn); overflow: hidden; }
+.progress > div { height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+details.row { display: block; }
+details.row summary { cursor: pointer; color: var(--accent); }
+#update-notes { white-space: pre-wrap; font-size: 12px; color: var(--text-2); margin-top: 8px; max-height: 220px; overflow-y: auto; }
+#update-box .row .btn { flex: none; }
