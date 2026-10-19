@@ -1,0 +1,3 @@
+2026-09-18 12:00:00,000 INFO send: +  0.41s FOUND 0e9d036c5823 'hume' at [fe80::e09d:3ff:fe6c:5823%awdl0]:8770; asking
+2026-09-18 12:00:02,000 INFO send: +  2.10s ASK -> accepted (1.69s)
+2026-09-18 12:00:02,600 INFO send: +  2.72s UPLOAD photo.jpg -> ok (2493 B, 0.62s)

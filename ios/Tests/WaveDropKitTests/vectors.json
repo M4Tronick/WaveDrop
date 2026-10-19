@@ -1,0 +1,114 @@
+{
+  "phone": {
+    "sk": "a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a001",
+    "pk": "4b9ef1a8f86fe2455e4b5cf439557284953cd3400431f173c397903798136c7b",
+    "id": "4a1f17ec00a893eebb8c",
+    "safety": "7535 9549 4159"
+  },
+  "pc": {
+    "sk": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b002",
+    "pk": "a332904b323839b86ddfef815e4bb049ea075ecc10ca3aa3db607cd31ff45625",
+    "id": "439e7fc7a1951de51172",
+    "safety": "4926 2773 4674"
+  },
+  "ephemeralPhone": {
+    "sk": "e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+    "pk": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f"
+  },
+  "ephemeralPc": {
+    "sk": "e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+    "pk": "19d80204bf85f3e1118e1b23410c88f0d0eeced5156f4c5bdf347b14ed7ec63f"
+  },
+  "b64": {
+    "bytes": "00ff10fe7f80",
+    "text": "AP8Q/n+A"
+  },
+  "lv": {
+    "hex": "000000026162000000020102"
+  },
+  "ask": {
+    "k1": "37d4bb06a87efeb1505e7a465e97a0c24228759866b9b6b072f13e4e5aa349e3"
+  },
+  "session": {
+    "key": "72f87cb91d613b72aacf1006ce6025ec1a9e83be7010ddf5469db0912550bf0a"
+  },
+  "chunk": {
+    "session": "sessione-1",
+    "file": 2,
+    "index": 5,
+    "last": true,
+    "plain": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f60616263",
+    "nonce": "000000020000000000000005",
+    "aad": "77642d6368756e6b0000000a73657373696f6e652d3100000002000000000000000501",
+    "sealed": "668fe912f1fc2e3c8f43de77424a3fa01a21c63d3621d9b56cf0011396e5eba59dbfa67f0d66287fa305829ac408a4e1486decb4be958c909cee19a343f23eeb9958a6cebc9e06c575f9542c3e2d68de9ecb9839285c3a4f50a14f2f8e0a192476801682003685a4300f76b04228e8c44b12fc8b"
+  },
+  "pairKeys": {
+    "link": "91c1248f732e767d9eb3de9741ae2339a924b2557a46e9111f8ff84ff28a6cfc",
+    "presence": "614757fe752807b46774db981397c41169e1fe89b82c0ad81f730be7196b6068"
+  },
+  "events": {
+    "t": "1792440662716",
+    "mac": "SnhlZMs246kBtL7t+jWuJKW+tUE7Y6TySNeefBBPT4A="
+  },
+  "cancel": {
+    "offer": "offerta-1",
+    "mac": "az6QehBRzvzM2NC0YBMk2R0Uuw6ikviNexUQNME8h1Y="
+  },
+  "qr": {
+    "secret": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+    "pairProof": "6kgZvZJJ5CqhGibvAnZ9r70ZVF8zWr46RjJJkG8TWLk=",
+    "okProof": "WLeDFxHhJHhKOg4PPAutxUfcfTb8OnC7xn1jAzp7or8="
+  },
+  "chunkCount": [
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1048576,
+      1
+    ],
+    [
+      1048577,
+      2
+    ],
+    [
+      5242880,
+      5
+    ]
+  ],
+  "jsAsk": {
+    "msg": {
+      "e": "T17oE6Jld+FXOPuHt8k1KFO/Hug/snXPXe2daLdndw4=",
+      "ct": "OFglUrbGjmi7CEbHd80+PpvtMbk7X8GS4K6c+8p+zx9lON5gWYj1YXE6BTIn9hguMD4E+jWHRnxrurfhIFP5S3sRipshNzqA5TtKyOCFY0hX4jCqE8tLgUp3AB5u1oUB"
+    },
+    "request": {
+      "name": "PC",
+      "platform": "win32",
+      "files": [
+        {
+          "name": "a.txt",
+          "size": 4
+        }
+      ],
+      "text": null
+    }
+  },
+  "jsAnswer": {
+    "msg": {
+      "e": "6DfkkoteMMqxJ8C0XsrvRz9JWhu+L6p62WEVOk81onQ=",
+      "ct": "Hd8N37hqLUx64jR8fFOgp6L+/HgfbJ+lZct/UUtRswmVz3slBnYojB5HRHtZT1n1yh47g+1YxNdvM3w="
+    },
+    "askK1": "89c52a09d5456baed2f3b3f76a2e9fce1d6929dee9b5dedfd91800c1f04a4305",
+    "note": "answer to jsAsk sealed by the phone side; opened by the PC with ephemeral from jsAsk"
+  },
+  "jsAskEphemeral": {
+    "sk": "32f351a258cf0218b277bbc843d40deaf4913adddf8a51e6884b2abbabc0d3bc",
+    "pk": "4f5ee813a26577e15738fb87b7c9352853bf1ee83fb275cf5ded9d68b767770e",
+    "k1": "89c52a09d5456baed2f3b3f76a2e9fce1d6929dee9b5dedfd91800c1f04a4305"
+  }
+}

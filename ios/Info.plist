@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2026 Matteo Davanzo · Licenza MIT</string>
+    <key>CFBundleDisplayName</key>
+    <string>WaveDrop</string>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>WaveDrop si collega ai tuoi PC sulla rete locale per scambiare file cifrati.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>La fotocamera serve per inquadrare il codice QR mostrato da WaveDrop sul PC.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>WaveDrop salva in Foto le immagini e i video che ricevi.</string>
+    <!-- The PC is reached by LAN address over HTTP; every payload is sealed end to end. -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    <!-- Received files appear in the Files app under "WaveDrop". -->
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <!-- wavedrop://pair?u=<QR link>, offered by the PC's web page. -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>app.wavedrop.pair</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>wavedrop</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

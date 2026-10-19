@@ -1,0 +1,210 @@
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --accent: #0a84ff;
+  --accent-soft: rgba(10, 132, 255, 0.14);
+  --ok: #28c840;
+  --bad: #ff3b30;
+  --text: #1d1d1f;
+  --text-2: rgba(60, 60, 67, 0.75);
+  --text-3: rgba(60, 60, 67, 0.5);
+  --glass: rgba(246, 246, 249, 0.76);
+  --glass-strong: rgba(248, 248, 250, 0.95);
+  --glass-edge: rgba(0, 0, 0, 0.12);
+  --hairline: rgba(0, 0, 0, 0.09);
+  --btn: rgba(120, 120, 128, 0.16);
+  --btn-hover: rgba(120, 120, 128, 0.24);
+  --menu: rgba(250, 250, 252, 0.92);
+  --scrim: rgba(10, 12, 20, 0.22);
+  --avatar: linear-gradient(180deg, #a9aebb 0%, #868b98 100%);
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #0a84ff;
+    --accent-soft: rgba(10, 132, 255, 0.22);
+    --ok: #32d74b;
+    --bad: #ff453a;
+    --text: #f5f5f7;
+    --text-2: rgba(235, 235, 245, 0.7);
+    --text-3: rgba(235, 235, 245, 0.42);
+    --glass: rgba(38, 38, 42, 0.74);
+    --glass-strong: rgba(44, 44, 48, 0.96);
+    --glass-edge: rgba(255, 255, 255, 0.12);
+    --hairline: rgba(255, 255, 255, 0.08);
+    --btn: rgba(120, 120, 128, 0.3);
+    --btn-hover: rgba(120, 120, 128, 0.42);
+    --menu: rgba(52, 52, 56, 0.94);
+    --scrim: rgba(0, 0, 0, 0.38);
+    --avatar: linear-gradient(180deg, #74777f 0%, #52555c 100%);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+button { font: inherit; color: inherit; }
+svg { display: block; }
+[hidden] { display: none !important; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: var(--btn);
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  transition: background 0.15s;
+}
+.icon-btn:hover { background: var(--btn-hover); }
+.icon-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+
+/* ───────── device tile (shared by overlay and island) ───────── */
+
+.peers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 6px 14px;
+}
+
+.peer {
+  width: 112px;
+  padding: 8px 4px 6px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: peer-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+.peer.leaving { animation: peer-out 0.25s ease both; pointer-events: none; }
+
+@keyframes peer-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes peer-out {
+  to { opacity: 0; transform: scale(0.7); }
+}
+
+.ava-wrap {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 7px;
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+.peer:hover .ava-wrap { transform: scale(1.04); }
+.peer:active .ava-wrap { transform: scale(0.97); }
+.peer.drop-target .ava-wrap { transform: scale(1.12); }
+
+.ava {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: var(--avatar);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.14);
+  transition: box-shadow 0.2s;
+}
+.peer.drop-target .ava { box-shadow: 0 0 0 3px var(--accent), 0 10px 28px rgba(10, 132, 255, 0.45); }
+
+/* Monogram colours (index chosen in the settings) and photo avatars. */
+.ava { overflow: hidden; }
+.ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ava[data-color="1"] { background: linear-gradient(180deg, #5ac8fa, #007aff); }
+.ava[data-color="2"] { background: linear-gradient(180deg, #c48cf5, #8944d8); }
+.ava[data-color="3"] { background: linear-gradient(180deg, #ff8fb1, #e5396f); }
+.ava[data-color="4"] { background: linear-gradient(180deg, #ffbf5e, #f27b1b); }
+.ava[data-color="5"] { background: linear-gradient(180deg, #7ee08a, #2fb14a); }
+.ava[data-color="6"] { background: linear-gradient(180deg, #6fe0d8, #12a5a0); }
+.ava[data-color="7"] { background: linear-gradient(180deg, #ff8a80, #e0372b); }
+.peer.is-contact .badge { background: var(--accent); color: #fff; }
+.peer.is-airdrop .badge { background: linear-gradient(180deg, #5ac8fa, #0a84ff); color: #fff; }
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 84px;
+  height: 84px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.ring circle { fill: none; stroke-width: 3.5; stroke-linecap: round; }
+.ring .track { stroke: transparent; transition: stroke 0.2s; }
+.ring .bar {
+  stroke: var(--accent);
+  stroke-dasharray: 251.33;
+  stroke-dashoffset: 251.33;
+  transition: stroke-dashoffset 0.25s linear, stroke 0.2s, opacity 0.3s;
+}
+.peer.is-waiting .ring { animation: spin 1.1s linear infinite; }
+.peer.is-waiting .ring .bar { stroke-dasharray: 62 189.33; stroke-dashoffset: 0; }
+.peer.is-sending .ring .track { stroke: var(--accent-soft); }
+.peer.is-done .ring .bar { stroke: var(--ok); stroke-dashoffset: 0; }
+@keyframes spin { to { transform: rotate(270deg); } }
+
+.badge, .check {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4), opacity 0.2s;
+}
+.badge { background: #fff; color: #6e6e73; }
+.badge svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.check { background: var(--ok); color: #fff; transform: scale(0); opacity: 0; }
+.check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.peer.is-done .check { transform: none; opacity: 1; }
+.peer.is-done .badge { opacity: 0; }
+
+.peer .name {
+  max-width: 108px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.peer .sub {
+  max-width: 108px;
+  margin-top: 1px;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.peer .sub[data-tone="accent"] { color: var(--accent); }
+.peer .sub[data-tone="ok"] { color: var(--ok); }
+.peer .sub[data-tone="bad"] { color: var(--bad); }
+.peer .sub[data-tone="muted"] { color: var(--text-3); }

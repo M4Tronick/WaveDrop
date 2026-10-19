@@ -1,0 +1,11 @@
+2026-10-19 21:14:01,870 INFO root: discover from fe80::f0f2:eeff:fec4:5af7: answered
+2026-10-19 21:14:02,101 INFO root: ask from iPhone di Matteo (iPhone): type public.heic, 1 item(s): IMG_0042.HEIC public.heic 2516582B
+2026-10-19 21:14:02,105 INFO root: upload 6F1C2A90: 30% of 51539607552 free bytes allows 15461882265 bytes
+2026-10-19 21:14:09,880 INFO root: upload 6F1C2A90: 2518016 bytes dvzip (TotalBytes 2516582)
+2026-10-19 21:14:09,912 INFO root: upload 6F1C2A90: decoded to 2519040 bytes, magic b'070707'
+2026-10-19 21:14:09,930 INFO root: upload 6F1C2A90: stored IMG_0042.HEIC
+2026-10-19 21:20:44,310 INFO root: ask from Mac di Giulia (MacBookPro18,3): type public.jpeg,com.adobe.pdf, 2 item(s): foto, mare.jpg public.jpeg 811020B; Preventivo.pdf com.adobe.pdf 183204B
+2026-10-19 21:20:47,002 INFO root: upload 1B77E0C4: stored foto, mare.jpg, Preventivo.pdf
+2026-10-19 21:22:05,004 INFO root: ask from iPhone di Matteo (iPhone): type links, 0 item(s): ['https://www.example.com/']
+2026-10-19 21:22:05,006 INFO root: link stored as www.example.com.url -> https://www.example.com/
+2026-10-19 21:25:13,551 WARNING root: ask REFUSED (contacts only): the sender sent no identity record

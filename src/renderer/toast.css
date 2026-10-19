@@ -1,0 +1,160 @@
+html, body { height: auto; }
+body { padding: 6px 12px 18px; }
+
+#stack { display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  position: relative;
+  padding: 10px 12px 12px;
+  border-radius: 18px;
+  background: var(--glass-strong);
+  box-shadow: 0 0 0 0.5px var(--glass-edge), 0 10px 30px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+  animation: card-in 0.42s cubic-bezier(0.2, 0.9, 0.25, 1.12) both;
+}
+.card.leaving { animation: card-out 0.22s ease both; }
+@keyframes card-in { from { opacity: 0; transform: translateX(40px) scale(0.98); } }
+@keyframes card-out { to { opacity: 0; transform: translateX(30px); } }
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 18px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.head img { width: 15px; height: 15px; }
+.head .when { margin-left: auto; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.head .x {
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  display: none;
+}
+.head .x svg { width: 8px; height: 8px; }
+.card:hover .head .x { display: grid; margin-left: auto; }
+.card:hover .head .when { display: none; }
+
+.main { display: flex; gap: 12px; align-items: center; }
+
+.thumb {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+.thumb img.preview {
+  max-width: 52px;
+  max-height: 52px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.thumb .ava { inset: 2px; font-size: 18px; }
+.thumb img.app { width: 46px; height: 46px; }
+.thumb .mini {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--glass-strong);
+}
+.thumb .mini svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.mini.ok { background: var(--ok); }
+.mini.bad { background: var(--bad); }
+
+.text { min-width: 0; flex: 1; }
+.headline {
+  font-size: 13px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.headline b { font-weight: 600; }
+.meta {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress {
+  height: 5px;
+  margin-top: 7px;
+  border-radius: 3px;
+  background: var(--btn);
+  overflow: hidden;
+}
+.progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.2s linear;
+}
+.progress.indeterminate i {
+  width: 35%;
+  animation: slide 1.2s ease-in-out infinite;
+}
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+
+.actions { display: flex; gap: 8px; margin-top: 11px; }
+.btn {
+  flex: 1;
+  height: 30px;
+  border: none;
+  border-radius: 9px;
+  background: var(--btn);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s, filter 0.15s;
+}
+.btn:hover { background: var(--btn-hover); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+
+.thumb .glyph { width: 46px; height: 46px; border-radius: 12px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+.thumb .glyph svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.code {
+  margin: 8px 0 2px;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  user-select: text;
+}
+.textbox {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--btn);
+  font-size: 12.5px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 120px;
+  overflow: auto;
+  user-select: text;
+}
+.trust { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12px; color: var(--text-2); cursor: pointer; }
+.trust input { margin: 0; accent-color: var(--accent); }

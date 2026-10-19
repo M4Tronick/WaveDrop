@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>WaveDrop</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="island.css">
+</head>
+<body data-mode="idle">
+  <div id="lift">
+  <div id="cap">
+    <div class="hover-row">
+      <img src="../../assets/icon.svg" alt="">
+      <span>Trascina qui per condividere</span>
+    </div>
+    <div class="open-content">
+      <div class="open-title">
+        <img src="../../assets/icon.svg" alt="">
+        <span>Rilascia su un dispositivo</span>
+      </div>
+      <div id="peers" class="peers"></div>
+      <div id="empty">Nessun dispositivo nelle vicinanze</div>
+    </div>
+  </div>
+  </div>
+  <script src="common.js"></script>
+  <script src="island.js"></script>
+</body>
+</html>

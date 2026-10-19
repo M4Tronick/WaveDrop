@@ -1,0 +1,1 @@
+No discovery report exists, please run 'opendrop find' first

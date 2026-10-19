@@ -1,0 +1,4 @@
+22:8b:38:31:89:4e   -34 dBm  [fe80::208b:38ff:fe31:894e%awdl0]:8770  hume
+b2:c4:98:5e:e6:be     ? dBm  [fe80::b0c4:98ff:fe5e:e6be%awdl0]:8770  (no response)
+f2:f2:ee:c4:5a:f7     ? dBm  [fe80::f0f2:eeff:fec4:5af7%awdl0]:8770  Brent's iPhone
+e2:9d:03:6c:58:23   -47 dBm  [fe80::e09d:3ff:fe6c:5823%awdl0]:8770

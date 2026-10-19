@@ -1,0 +1,69 @@
+{
+  "name": "wavedrop",
+  "productName": "WaveDrop",
+  "version": "1.0.0",
+  "description": "Condivisione file in stile AirDrop, in sovraimpressione, per Windows, macOS e Linux",
+  "main": "src/main.js",
+  "author": "Matteo Davanzo",
+  "license": "MIT",
+  "scripts": {
+    "start": "npm run build:web && electron .",
+    "start:2": "electron . --instance=2",
+    "test": "node --test \"test/*.test.js\"",
+    "build:web": "esbuild src/web/app.js --bundle --minify --format=iife --target=es2020,safari15,chrome100 --outfile=src/web/app.bundle.js",
+    "build:ble": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-ble-helper.ps1",
+    "icons": "electron scripts/make-icons.js",
+    "dist": "npm run build:web && electron-builder --win portable nsis",
+    "dist:linux": "npm run build:web && electron-builder --linux AppImage"
+  },
+  "build": {
+    "appId": "app.wavedrop.desktop",
+    "productName": "WaveDrop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "!src/web/app.js",
+      "assets/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "mac": {
+      "icon": "assets/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": [
+        "AppImage"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "asarUnpack": [
+      "assets/ble-helper.exe"
+    ],
+    "copyright": "Copyright © 2026 Matteo Davanzo"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.4.0",
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "qrcode": "^1.5.4"
+  }
+}

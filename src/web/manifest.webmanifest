@@ -1,0 +1,11 @@
+{
+  "name": "WaveDrop",
+  "short_name": "WaveDrop",
+  "description": "Condividi file con il tuo PC, cifrati end-to-end",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }]
+}

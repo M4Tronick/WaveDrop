@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>Impostazioni di WaveDrop</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <nav id="sidebar">
+    <div class="me-card">
+      <div class="ava" id="side-ava"></div>
+      <div>
+        <div class="me-name" id="side-name"></div>
+        <div class="me-sub">WaveDrop</div>
+      </div>
+    </div>
+    <button data-section="profilo"><span class="ico" style="--c:#8e8e93" data-icon="person"></span>Profilo</button>
+    <button data-section="ricezione"><span class="ico" style="--c:#0a84ff" data-icon="download"></span>Ricezione</button>
+    <button data-section="contatti"><span class="ico" style="--c:#34c759" data-icon="people"></span>Contatti</button>
+    <button data-section="telefono"><span class="ico" style="--c:#ff9f0a" data-icon="phone"></span>Telefono</button>
+    <button data-section="generale"><span class="ico" style="--c:#636366" data-icon="gear"></span>Generale</button>
+    <button data-section="cronologia"><span class="ico" style="--c:#5e5ce6" data-icon="clock"></span>Cronologia</button>
+    <button data-section="sicurezza"><span class="ico" style="--c:#ff375f" data-icon="shield"></span>Sicurezza</button>
+    <button data-section="informazioni"><span class="ico" style="--c:#0a84ff" data-icon="info"></span>Informazioni</button>
+  </nav>
+
+  <main id="content">
+    <!-- PROFILO -->
+    <section data-section="profilo">
+      <h1>Profilo</h1>
+      <div class="profile-hero">
+        <div class="ava big" id="avatar"></div>
+        <div class="profile-actions">
+          <button class="btn" id="avatar-choose">Scegli foto…</button>
+          <button class="btn" id="avatar-remove">Usa le iniziali</button>
+        </div>
+      </div>
+      <div class="group">
+        <label class="row"><span class="grow">Nome</span><input id="name" class="text-input" maxlength="40" spellcheck="false"></label>
+        <div class="row"><span class="grow">Colore delle iniziali</span><div class="swatches" id="swatches"></div></div>
+      </div>
+      <p class="note">Il nome, la foto e il colore sono ciò che vedono gli altri dispositivi nelle vicinanze. Con la visibilità «Solo contatti» li vedono solo i dispositivi abbinati.</p>
+    </section>
+
+    <!-- RICEZIONE -->
+    <section data-section="ricezione">
+      <h1>Ricezione</h1>
+      <h2>Chi ti può trovare</h2>
+      <div class="segmented" id="visibility">
+        <button data-v="everyone">Tutti</button>
+        <button data-v="contacts">Solo contatti</button>
+        <button data-v="off">Nessuno</button>
+      </div>
+      <p class="note" id="visibility-note"></p>
+
+      <h2>Dove salvare</h2>
+      <div class="group">
+        <div class="row">
+          <span class="grow"><span class="path" id="save-dir"></span></span>
+          <button class="btn small" id="save-dir-open">Apri</button>
+          <button class="btn small" id="save-dir-choose">Cambia…</button>
+        </div>
+        <label class="row"><span class="grow">Chiedi ogni volta dove salvare<span class="hint">Se è spento, i file vanno sempre nella cartella qui sopra.</span></span><input type="checkbox" class="switch" data-key="askWhere"></label>
+        <label class="row"><span class="grow">Una sottocartella per ogni mittente<span class="hint">Esempio: Download\WaveDrop\Mario</span></span><input type="checkbox" class="switch" data-key="senderFolders"></label>
+      </div>
+
+      <h2>Quando arriva qualcosa</h2>
+      <div class="group">
+        <label class="row"><span class="grow">Accetta in automatico dai contatti attendibili<span class="hint">Scegli quali contatti sono attendibili nella sezione Contatti.</span></span><input type="checkbox" class="switch" data-key="autoAcceptTrusted"></label>
+        <label class="row">
+          <span class="grow">Dopo la ricezione</span>
+          <select data-key="afterReceive">
+            <option value="none">Non fare nulla</option>
+            <option value="reveal">Mostra nella cartella</option>
+            <option value="open">Apri il file</option>
+          </select>
+        </label>
+        <label class="row"><span class="grow">Suono di notifica</span><input type="checkbox" class="switch" data-key="sound"></label>
+      </div>
+    </section>
+
+    <!-- CONTATTI -->
+    <section data-section="contatti">
+      <h1>Contatti</h1>
+      <p class="note top">Un dispositivo diventa contatto dopo il primo abbinamento con il codice a 6 cifre (o con il QR per i telefoni). I contatti <b>attendibili</b> possono inviarti file senza chiedere conferma.</p>
+      <div class="group" id="contacts"></div>
+      <div id="contacts-empty" class="empty">Nessun contatto ancora. Invia un file a un dispositivo vicino: ti verrà chiesto il codice che compare sul suo schermo.</div>
+
+      <h2>Nelle vicinanze, non abbinati</h2>
+      <div class="group" id="nearby"></div>
+      <div id="nearby-empty" class="empty small">Nessun nuovo dispositivo nelle vicinanze.</div>
+    </section>
+
+    <!-- TELEFONO -->
+    <section data-section="telefono">
+      <h1>Telefono</h1>
+      <div class="phone-card">
+        <div class="qr-box"><img id="qr" alt="Codice QR"></div>
+        <div>
+          <h3 id="phone-title">Collega iPhone o Android</h3>
+          <ol>
+            <li>Collega il telefono alla stessa rete Wi-Fi di questo PC.</li>
+            <li>Nell'app <b>WaveDrop</b> (Android o iPhone) tocca <b>Scansiona il codice QR</b>, oppure inquadra il codice con la <b>Fotocamera</b> e tocca il link.</li>
+            <li>Scegli un nome per il telefono e tocca <b>Collega</b>.</li>
+            <li>Per averlo come app: su iPhone <b>Condividi → Aggiungi alla schermata Home</b>, su Android menu ⋮ → <b>Aggiungi a schermata Home</b>.</li>
+          </ol>
+          <div class="phone-buttons"><button class="btn" id="qr-new">Nuovo codice</button><span class="hint" id="qr-expiry"></span></div>
+        </div>
+      </div>
+      <p class="note">Puoi usare l'app nativa WaveDrop (Android: <code>dist\WaveDrop-Android-1.0.0.apk</code>; iPhone: vedi <code>ios\README.md</code>) oppure l'app web servita da questo PC, senza installare nulla. Il codice QR contiene un segreto monouso e la chiave pubblica del PC, quindi il collegamento è verificato. I file restano cifrati end-to-end tra telefono e PC.</p>
+      <h2>Telefoni collegati</h2>
+      <div class="group" id="phones"></div>
+      <div id="phones-empty" class="empty small">Nessun telefono collegato.</div>
+    </section>
+
+    <!-- GENERALE -->
+    <section data-section="generale">
+      <h1>Generale</h1>
+      <div class="group">
+        <label class="row"><span class="grow">Avvia WaveDrop all'accesso</span><input type="checkbox" class="switch" data-key="loginItem"></label>
+        <label class="row"><span class="grow">Isola di trascinamento in alto<span class="hint">La pillola al centro del bordo superiore: trascinaci sopra i file da Esplora file.</span></span><input type="checkbox" class="switch" data-key="island"></label>
+        <label class="row" id="sendto-row"><span class="grow">Mostra in «Invia a» di Esplora file<span class="hint">Clic destro su un file → Invia a → WaveDrop.</span></span><input type="checkbox" class="switch" data-key="sendTo"></label>
+        <label class="row">
+          <span class="grow">Scorciatoia per aprire WaveDrop<span class="hint" id="hotkey-warning"></span></span>
+          <select data-key="hotkey" id="hotkey"></select>
+        </label>
+        <label class="row">
+          <span class="grow">Aspetto</span>
+          <select data-key="theme">
+            <option value="system">Come il sistema</option>
+            <option value="light">Chiaro</option>
+            <option value="dark">Scuro</option>
+          </select>
+        </label>
+      </div>
+      <h2>Bluetooth</h2>
+      <div class="group">
+        <label class="row"><span class="grow">Trova i dispositivi vicini anche via Bluetooth<span class="hint" id="ble-state"></span></span><input type="checkbox" class="switch" data-key="bluetooth"></label>
+      </div>
+      <p class="note">Come AirDrop, WaveDrop trasmette un piccolo segnale Bluetooth LE con l'indirizzo di rete. Così trova i PC vicini anche sulle reti che bloccano la ricerca normale (Wi-Fi ospiti) e mette per primi quelli più vicini. I file viaggiano comunque in rete.</p>
+
+      <!-- Linux only: hidden unless the main process reports a bridge -->
+      <div id="airdrop-block" hidden>
+        <h2>AirDrop</h2>
+        <div class="group">
+          <label class="row"><span class="grow">Ponte AirDrop (solo Linux)<span class="hint" id="airdrop-state"></span></span><input type="checkbox" class="switch" data-key="airdrop"></label>
+          <div class="row" id="airdrop-visible-row"><span class="grow">Visibile ai dispositivi Apple<span class="hint" id="airdrop-visible-hint"></span></span><button class="btn small" id="airdrop-visible"></button></div>
+        </div>
+        <p class="note warn" id="airdrop-warning"></p>
+        <p class="note">Scambia file con iPhone, iPad e Mac attraverso <b>omdrop-owl</b> (oppure OpenDrop). Sul dispositivo Apple AirDrop deve essere su <b>«Tutti per 10 minuti»</b>. Mentre il PC è visibile, i file AirDrop vengono accettati senza chiedere e salvati nella cartella dei ricevuti; i dispositivi Apple compaiono nell'overlay con il marchio AirDrop.</p>
+      </div>
+    </section>
+
+    <!-- CRONOLOGIA -->
+    <section data-section="cronologia">
+      <h1>Cronologia</h1>
+      <div class="group" id="history"></div>
+      <div id="history-empty" class="empty">Ancora nessun trasferimento.</div>
+      <div class="actions-end"><button class="btn" id="history-clear">Cancella cronologia</button></div>
+    </section>
+
+    <!-- SICUREZZA -->
+    <section data-section="sicurezza">
+      <h1>Sicurezza</h1>
+      <div class="safety">
+        <div class="safety-label">Il tuo codice di sicurezza</div>
+        <div class="safety-code" id="safety"></div>
+        <div class="hint">Confrontalo con quello che l'altro vede accanto al tuo nome nei suoi Contatti: se coincide, nessuno si è messo in mezzo.</div>
+      </div>
+      <div class="group">
+        <div class="row"><span class="grow">Cifratura</span><span class="value">End-to-end · X25519 + ChaCha20-Poly1305</span></div>
+        <div class="row"><span class="grow">Primo contatto</span><span class="value">Codice a 6 cifre (CPace) o QR</span></div>
+        <div class="row"><span class="grow">Chiave privata</span><span class="value" id="key-protection">Protetta da Windows (DPAPI)</span></div>
+        <div class="row"><span class="grow">Indirizzo in rete</span><span class="value mono" id="address"></span></div>
+      </div>
+      <p class="note">Ogni trasferimento usa chiavi nuove (forward secrecy): anche chi registrasse il traffico oggi non potrebbe leggerlo domani. Nessun file passa da server esterni.</p>
+      <div class="actions-end"><button class="btn danger" id="reset-identity">Rigenera identità…</button></div>
+    </section>
+
+    <!-- INFORMAZIONI -->
+    <section data-section="informazioni">
+      <div class="about-hero">
+        <img src="../../assets/icon.png" alt="" class="about-icon">
+        <h1>WaveDrop</h1>
+        <div class="about-version" id="about-version"></div>
+        <div class="about-author">Creato da <b>Matteo Davanzo</b></div>
+      </div>
+      <div class="group">
+        <div class="row"><span class="grow">Autore</span><span class="value">Matteo Davanzo</span></div>
+        <div class="row"><span class="grow">Licenza</span><span class="value">MIT · © 2026 Matteo Davanzo</span></div>
+        <button class="row link" id="about-repo" hidden><span class="grow">Codice sorgente su GitHub</span><span class="value" id="about-repo-url"></span></button>
+      </div>
+      <h2>Ringraziamenti</h2>
+      <p class="note top">WaveDrop esiste grazie a chi ha studiato AirDrop e ha reso pubblici i propri strumenti. Grazie!</p>
+      <div class="group">
+        <button class="row link" data-url="https://github.com/seemoo-lab/opendrop"><span class="grow"><b>OpenDrop</b> · SEEMOO, TU Darmstadt<span class="hint">Studio del protocollo AirDrop e ponte di riserva su Linux</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/seemoo-lab/owl"><span class="grow"><b>OWL</b> · SEEMOO, TU Darmstadt<span class="hint">AWDL aperto, la radio Wi-Fi di AirDrop</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/t4t5/omdrop-owl"><span class="grow"><b>omdrop-owl</b> · t4t5<span class="hint">Radio AWDL del ponte AirDrop su Linux</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/netmojo-systems/omdrop-plugin"><span class="grow"><b>omdrop-plugin</b> · netmojo-systems<span class="hint">Ricevitore e mittente AirDrop del ponte</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/xtool-org/xtool"><span class="grow"><b>xtool</b> · xtool-org<span class="hint">App iPhone compilata senza Mac</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/electron/electron"><span class="grow"><b>Electron</b> · OpenJS Foundation<span class="hint">Base dell'app desktop</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/paulmillr/noble-curves"><span class="grow"><b>noble-curves, -ciphers, -hashes</b> · Paul Miller<span class="hint">Crittografia: X25519, ristretto255, ChaCha20-Poly1305</span></span><span class="value">↗</span></button>
+        <button class="row link" data-url="https://github.com/soldair/node-qrcode"><span class="grow"><b>node-qrcode</b> · Ryan Day<span class="hint">Codici QR per collegare i telefoni</span></span><span class="value">↗</span></button>
+      </div>
+      <p class="note">L'elenco completo, con le librerie delle app Android e iPhone, è nel file CREDITS.md del progetto. AirDrop e iPhone sono marchi di Apple Inc.; WaveDrop è un progetto indipendente, non affiliato ad Apple.</p>
+    </section>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

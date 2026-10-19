@@ -1,0 +1,117 @@
+/* Dynamic-Island style drop target pinned to the top edge of the screen. */
+
+:root {
+  --spring: cubic-bezier(0.2, 0.9, 0.25, 1.12);
+}
+
+/* Offsets the capsule when the window extends above the screen edge (see placeIsland). */
+#lift {
+  position: absolute;
+  inset: 0;
+  transform: translateY(var(--lift, 0px));
+}
+
+#cap {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 96px;
+  height: 6px;
+  border-radius: 3px;
+  transform: translateX(-50%);
+  background: rgba(24, 24, 27, 0.7);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  overflow: hidden;
+  transition:
+    width 0.34s var(--spring),
+    height 0.34s var(--spring),
+    border-radius 0.34s var(--spring),
+    top 0.34s var(--spring),
+    background 0.2s;
+}
+body[data-mode="hover"] #cap {
+  top: 4px;
+  width: 214px;
+  height: 30px;
+  border-radius: 15px;
+  background: #000;
+  cursor: pointer;
+}
+body[data-mode="open"] #cap {
+  top: 6px;
+  width: 664px;
+  height: 226px;
+  border-radius: 34px;
+  background: #000;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.hover-row,
+.open-content {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+body[data-mode="hover"] .hover-row,
+body[data-mode="open"] .open-content {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.25s 0.12s;
+}
+
+.hover-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.hover-row img { width: 17px; height: 17px; }
+
+.open-content {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px 10px;
+}
+.open-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+.open-title img { width: 18px; height: 18px; }
+
+#peers {
+  flex: 1;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: safe center;
+  align-items: center;
+  margin-top: 6px;
+}
+#peers::-webkit-scrollbar { height: 0; }
+#peers .peer .name { color: #fff; }
+#peers .peer .sub { color: rgba(255, 255, 255, 0.55); }
+#peers .peer .sub[data-tone="accent"] { color: #4aa3ff; }
+#peers .peer .sub[data-tone="ok"] { color: #32d74b; }
+#peers .peer .sub[data-tone="bad"] { color: #ff6961; }
+#peers .peer .ava { background: linear-gradient(180deg, #7b7e87 0%, #55585f 100%); }
+#peers .peer .badge { background: #2c2c2e; color: #d1d1d6; }
+
+#empty {
+  position: absolute;
+  inset: 40px 0 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+body.has-peers #empty { display: none; }

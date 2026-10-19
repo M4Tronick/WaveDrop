@@ -1,0 +1,5 @@
+version: 1
+bundleID: app.wavedrop.ios
+product: WaveDrop
+infoPath: Info.plist
+iconPath: Resources/AppIcon.png

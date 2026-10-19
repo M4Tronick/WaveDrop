@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>WaveDrop</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+  <div id="backdrop"></div>
+  <div id="scrim"></div>
+
+  <main id="panel" role="dialog" aria-label="WaveDrop">
+    <header class="titlebar">
+      <button id="open-settings" class="icon-btn" aria-label="Impostazioni" title="Impostazioni"></button>
+      <div class="title"><img src="../../assets/icon.svg" alt=""><span>WaveDrop</span></div>
+      <button id="close" class="icon-btn" aria-label="Chiudi"></button>
+    </header>
+
+    <div id="pending" hidden>
+      <div class="pending-icon"></div>
+      <div class="pending-text">
+        <strong id="pending-title"></strong>
+        <span>Scegli a chi inviarlo</span>
+      </div>
+      <button id="pending-clear" class="icon-btn" aria-label="Annulla"></button>
+    </div>
+
+    <section id="stage">
+      <div id="peers" class="peers"></div>
+      <div id="empty">
+        <div class="empty-title">Ricerca di dispositivi nelle vicinanze<span class="dots"><i>.</i><i>.</i><i>.</i></span></div>
+        <div class="empty-sub">Apri WaveDrop sugli altri computer della stessa rete, oppure collega il tuo telefono.</div>
+      </div>
+    </section>
+    <p id="tip">Clic su un dispositivo per scegliere i file, oppure trascinali sopra. Clic destro per testo, cartelle e contatti.</p>
+
+    <section id="radar" aria-hidden="true">
+      <div class="bands"></div>
+      <div class="waves"><i></i><i></i><i></i></div>
+      <img class="logo" src="../../assets/icon.svg" alt="">
+    </section>
+
+    <p class="caption" id="caption"></p>
+    <div class="discover">
+      <span>Consenti di essere rilevato da:</span>
+      <button id="visibility" class="link"><span id="visibility-label">Tutti</span></button>
+      <div id="vis-menu" class="menu" hidden>
+        <button data-v="off"><span class="tick"></span>Ricezione disattivata</button>
+        <button data-v="contacts"><span class="tick"></span>Solo contatti</button>
+        <button data-v="everyone"><span class="tick"></span>Tutti</button>
+      </div>
+    </div>
+    <!-- Linux only, when the AirDrop bridge is on (Impostazioni › Generale) -->
+    <div id="airdrop-bar" hidden>
+      <span class="airdrop-glyph" data-icon="airdrop"></span>
+      <span id="airdrop-text"></span>
+      <button id="airdrop-action" class="link"></button>
+    </div>
+
+    <footer>
+      <label class="me" for="me-name">
+        <div class="ava me-ava" id="me-ava"></div>
+        <div class="me-text">
+          <span class="label">Gli altri ti vedono come</span>
+          <input id="me-name" maxlength="40" spellcheck="false" autocomplete="off">
+        </div>
+      </label>
+      <div class="footer-actions">
+        <kbd id="hotkey"></kbd>
+        <button id="link-phone" class="pill"><span class="pill-icon" data-icon="phone"></span>Collega telefono</button>
+        <button id="open-folder" class="pill"><span class="pill-icon" data-icon="folder"></span>Ricevuti</button>
+      </div>
+    </footer>
+
+    <!-- Code entry the first time we send to a device -->
+    <div id="pair-sheet" class="sheet-wrap" hidden>
+      <div class="sheet">
+        <div class="sheet-icon" data-icon="shield"></div>
+        <h2 id="pair-title"></h2>
+        <p id="pair-text"></p>
+        <input id="pair-code" class="code-input" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" spellcheck="false">
+        <p id="pair-error" class="sheet-error" hidden></p>
+        <div class="sheet-buttons">
+          <button id="pair-cancel" class="btn">Annulla</button>
+          <button id="pair-ok" class="btn primary" disabled>Abbina</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR code to link a phone -->
+    <div id="phone-sheet" class="sheet-wrap" hidden>
+      <div class="sheet wide">
+        <div class="qr-layout">
+          <div class="qr-box"><img id="qr" alt="Codice QR"></div>
+          <div class="qr-text">
+            <h2 id="phone-title">Collega il tuo telefono</h2>
+            <ol id="phone-steps">
+              <li>Con l'app <b>WaveDrop</b> per Android o iPhone: tocca <b>Scansiona il codice QR</b>.</li>
+              <li>Senza app: apri la <b>Fotocamera</b>, inquadra il codice, tocca il link e scegli <b>Collega</b>.</li>
+              <li>Per averlo come app: su iPhone <b>Condividi → Aggiungi alla schermata Home</b>; su Android menu ⋮ → <b>Aggiungi a schermata Home</b>.</li>
+            </ol>
+            <p class="small" id="phone-note">Il telefono deve essere sulla stessa rete Wi-Fi. Il codice vale una sola volta per 5 minuti.</p>
+            <p class="small mono" id="phone-url"></p>
+          </div>
+        </div>
+        <div class="sheet-buttons">
+          <button id="phone-new" class="btn">Nuovo codice</button>
+          <button id="phone-done" class="btn primary">Fatto</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>

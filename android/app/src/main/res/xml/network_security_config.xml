@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The PC is reached by its LAN address over plain HTTP. Everything sent over
+     it is sealed end to end (ChaCha20-Poly1305), so cleartext is allowed. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

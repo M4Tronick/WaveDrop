@@ -1,0 +1,4 @@
+Announcing service: host matteo-thinkpad, address fe80::a2b3:ccff:fe01:2345, port 8771
+Starting HTTPS server
+Receiving file(s) ...
+File(s) received (size 2.40 MB, speed 0.85 MB/s)

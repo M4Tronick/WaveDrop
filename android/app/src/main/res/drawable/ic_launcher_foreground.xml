@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Waves above a drop (same mark as the desktop icon), inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="256" android:viewportHeight="256">
+    <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="128" android:pivotY="128" android:translateY="-6">
+        <path android:pathData="M45.3,141.9 A88,88 0 0,1 210.7,141.9" android:strokeColor="#8CFFFFFF"
+            android:strokeWidth="15" android:strokeLineCap="round" android:fillColor="#00000000" />
+        <path android:pathData="M75.4,152.8 A56,56 0 0,1 180.6,152.8" android:strokeColor="#D9FFFFFF"
+            android:strokeWidth="15" android:strokeLineCap="round" android:fillColor="#00000000" />
+        <path android:pathData="M128,130 C121,142 107,156 107,173 A21,21 0 0,0 149,173 C149,156 135,142 128,130 Z"
+            android:fillColor="#FFFFFFFF" />
+    </group>
+</vector>

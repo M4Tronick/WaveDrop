@@ -1,0 +1,25 @@
+# Node / Electron
+node_modules/
+dist/
+src/web/app.bundle.js
+
+# Android
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+android/captures/
+*.iml
+.idea/
+
+# iOS (xtool / SwiftPM)
+ios/.build/
+ios/.swiftpm/
+ios/xtool/
+*.ipa
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log

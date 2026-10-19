@@ -1,0 +1,1 @@
+{"ready": false, "missing": [{"id": "hardware", "say": "omdrop-owl hasn't been tested on this computer's Wi-Fi (ath11k_pci). To try it anyway, put 1 in /etc/omdrop/allow-untested, and please report how it goes (README, \"Adding your card\")."}], "offers": []}

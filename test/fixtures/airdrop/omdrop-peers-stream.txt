@@ -1,0 +1,4 @@
+{"mac": "22:8b:38:31:89:4e", "rssi": -34, "name": "hume"}
+{"mac": "b2:c4:98:5e:e6:be", "rssi": null, "name": null}
+{"mac": "f2:f2:ee:c4:5a:f7", "rssi": null, "name": "Brent's iPhone"}
+{"mac": "86:08:04:8a:2b:f4", "rssi": null, "name": "iPhone di Matteo"}
