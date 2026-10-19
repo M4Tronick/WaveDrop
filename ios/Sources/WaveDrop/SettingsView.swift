@@ -83,8 +83,8 @@ struct SettingsView: View {
 /// Camera QR scanner (VisionKit), with a fallback when the device can't scan.
 enum About {
     static let author = "Matteo Davanzo"
-    /// The project's GitHub page; nil until the repository exists.
-    static let repo: URL? = nil
+    /// The project's GitHub page.
+    static let repo = URL(string: "https://github.com/M4Tronick/WaveDrop")
     static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0" }
 
     struct Credit { let name, by, what: String; let url: URL }

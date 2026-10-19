@@ -1,6 +1,6 @@
 # WaveDrop
 
-_di **Matteo Davanzo** · licenza [MIT](LICENSE)_
+_di **Matteo Davanzo** · licenza [MIT](LICENSE) · [github.com/M4Tronick/WaveDrop](https://github.com/M4Tronick/WaveDrop)_
 
 Condivisione di file in stile AirDrop per Windows (funziona anche su macOS e Linux), con un'interfaccia in sovraimpressione. Ha un'app nativa per **Android** (Kotlin), una per **iPhone** (SwiftUI, compilata da Windows con xtool) e un'app web che funziona su qualsiasi telefono. Tutto è **cifrato end-to-end** e la prima volta si verifica l'altro dispositivo con un **codice a 6 cifre**.
 

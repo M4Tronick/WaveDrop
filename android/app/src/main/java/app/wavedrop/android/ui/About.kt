@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 
 const val AUTHOR = "Matteo Davanzo"
 
-/** The project's GitHub page; null until the repository exists. */
-val REPO_URL: String? = null
+/** The project's GitHub page. */
+val REPO_URL: String? = "https://github.com/M4Tronick/WaveDrop"
 
 private class Credit(val name: String, val by: String, val what: String, val url: String)
 

@@ -6,6 +6,11 @@
   "main": "src/main.js",
   "author": "Matteo Davanzo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M4Tronick/WaveDrop.git"
+  },
+  "homepage": "https://github.com/M4Tronick/WaveDrop",
   "scripts": {
     "start": "npm run build:web && electron .",
     "start:2": "electron . --instance=2",
