@@ -117,7 +117,7 @@ enum About {
         return false
     }
 
-    static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.1" }
+    static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.2" }
 
     struct Credit { let name, by, what: String; let url: URL }
     static let credits = [
