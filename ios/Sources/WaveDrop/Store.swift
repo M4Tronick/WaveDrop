@@ -16,8 +16,20 @@ struct Pc: Codable, Identifiable, Equatable {
     var pkData: Data { (try? Proto.unb64(pk)) ?? Data() }
 }
 
+/// Another phone this iPhone is paired with (through a QR code shown on one of them).
+struct Phone: Codable, Identifiable, Equatable {
+    let id: String
+    let pk: String
+    var name: String
+    let platform: String
+    var url: String // last known http://ip:port of its server; Bonjour keeps it fresh
+    let addedAt: Date
+
+    var pkData: Data { (try? Proto.unb64(pk)) ?? Data() }
+}
+
 /// Identity (private key in the Keychain, this device only), paired PCs and
-/// preferences.
+/// phones, preferences.
 final class Store {
     private let defaults = UserDefaults.standard
     let identity: KeyPair
@@ -51,6 +63,23 @@ final class Store {
 
     func save(_ pc: Pc) { pcs = pcs.filter { $0.id != pc.id } + [pc] }
     func remove(_ id: String) { pcs = pcs.filter { $0.id != id } }
+
+    var phones: [Phone] {
+        get {
+            guard let data = defaults.data(forKey: "phones") else { return [] }
+            return (try? JSONDecoder().decode([Phone].self, from: data)) ?? []
+        }
+        set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "phones") }
+    }
+
+    func save(_ phone: Phone) { phones = phones.filter { $0.id != phone.id } + [phone] }
+    func removePhone(_ id: String) { phones = phones.filter { $0.id != id } }
+
+    /// Whether other phones on the network can see this iPhone and send to it.
+    var visibleToPhones: Bool {
+        get { defaults.object(forKey: "visibleToPhones") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "visibleToPhones") }
+    }
 }
 
 enum Keychain {

@@ -38,8 +38,31 @@ data class Pc(
     }
 }
 
+/** Another phone this one is paired with (through a QR code shown on one of them). */
+data class Phone(
+    val id: String,
+    val pk: String,
+    val name: String,
+    val platform: String,
+    val url: String, // last known http://ip:port of its server; Bonjour keeps it fresh
+    val addedAt: Long,
+) {
+    val pkBytes: ByteArray get() = Proto.unb64(pk)
+
+    fun toJson(): JSONObject = JSONObject()
+        .put("id", id).put("pk", pk).put("name", name)
+        .put("platform", platform).put("url", url).put("addedAt", addedAt)
+
+    companion object {
+        fun fromJson(o: JSONObject) = Phone(
+            o.getString("id"), o.getString("pk"), o.getString("name"),
+            o.optString("platform"), o.optString("url"), o.optLong("addedAt"),
+        )
+    }
+}
+
 /**
- * Identity, paired PCs and preferences. The X25519 private key is wrapped with
+ * Identity, paired PCs and phones, preferences. The X25519 private key is wrapped with
  * an AES key that lives in the Android Keystore and never leaves it.
  */
 class Store(private val context: Context) {
@@ -71,6 +94,24 @@ class Store(private val context: Context) {
 
     private fun writePcs(list: List<Pc>) {
         prefs.edit().putString("pcs", JSONArray(list.map { it.toJson() }).toString()).apply()
+    }
+
+    /** Whether other phones on the network can see this one and send to it. */
+    var visibleToPhones: Boolean
+        get() = prefs.getBoolean("visibleToPhones", true)
+        set(value) = prefs.edit().putBoolean("visibleToPhones", value).apply()
+
+    fun phones(): List<Phone> {
+        val arr = JSONArray(prefs.getString("phones", "[]"))
+        return (0 until arr.length()).map { Phone.fromJson(arr.getJSONObject(it)) }
+    }
+
+    fun savePhone(phone: Phone) = writePhones(phones().filter { it.id != phone.id } + phone)
+
+    fun removePhone(id: String) = writePhones(phones().filter { it.id != id })
+
+    private fun writePhones(list: List<Phone>) {
+        prefs.edit().putString("phones", JSONArray(list.map { it.toJson() }).toString()).apply()
     }
 
     private fun defaultName(): String =

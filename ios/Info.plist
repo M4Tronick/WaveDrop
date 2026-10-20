@@ -17,7 +17,12 @@
         <string>UIInterfaceOrientationPortrait</string>
     </array>
     <key>NSLocalNetworkUsageDescription</key>
-    <string>WaveDrop si collega ai tuoi PC sulla rete locale per scambiare file cifrati.</string>
+    <string>WaveDrop si collega ai tuoi PC e agli altri telefoni sulla rete locale per scambiare file cifrati.</string>
+    <!-- Phones find each other over Bonjour (PeerService.swift); iOS lists the service types an app may use. -->
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_wavedrop._tcp</string>
+    </array>
     <key>NSCameraUsageDescription</key>
     <string>La fotocamera serve per inquadrare il codice QR mostrato da WaveDrop sul PC.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>

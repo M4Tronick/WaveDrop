@@ -12,6 +12,10 @@
 //             DH(eA,sB)+DH(sA,sB) (authenticates the sender), the answer adds
 //             DH(eB,eA)+DH(eB,sA) (forward secrecy, authenticates the receiver).
 //             Files travel in 1 MiB chunks sealed with ChaCha20-Poly1305.
+//  Phones     The Android and iPhone apps also serve /Ask, /Chunk and /Cancel
+//             to each other (android/…/net/PeerServer.kt, ios/…/PeerCore.swift),
+//             found over Bonjour (_wavedrop._tcp). Two phones pair with a QR
+//             code instead of CPace: qrProof with "wd-peer-pair" / "wd-peer-ok".
 
 const { x25519, ristretto255, ristretto255_hasher } = require('@noble/curves/ed25519.js');
 const { chacha20poly1305 } = require('@noble/ciphers/chacha.js');

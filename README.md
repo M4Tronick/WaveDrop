@@ -58,6 +58,17 @@ Dal telefono puoi inviare foto, file e testi al PC e accettare quello che il PC 
 
 **App web nella schermata Home, senza ricollegarla.** Dopo il collegamento l'indirizzo della pagina contiene una chiave (`#h=…`). La chiave sta dopo il `#`, quindi il telefono non la invia mai in rete. Il PC conserva l'identità del telefono cifrata con quella chiave, senza poterla leggere. Quando apri l'icona della schermata Home, la pagina recupera quella copia e torna lo stesso dispositivo, con lo stesso nome e lo stesso identificativo interno, senza QR. Serve perché su iPhone l'icona ha una memoria separata da Safari. Se rimuovi il telefono nelle Impostazioni del PC, anche l'icona viene scollegata. Se l'icona è stata aggiunta prima di collegarsi, nella pagina c'è **Fotografa il codice QR**.
 
+### Da telefono a telefono
+Le app native (Android e iPhone) scambiano file anche **direttamente tra telefoni**, senza PC: Android con Android, iPhone con iPhone, Android con iPhone. Basta essere sulla stessa rete Wi-Fi.
+1. Apri WaveDrop su entrambi i telefoni. Nella sezione **Telefoni vicini** ognuno vede l'altro.
+2. La prima volta, abbinali: tocca **Abbina** accanto all'altro telefono. Sull'altro compare una richiesta: tocca **Mostra il codice QR** e inquadralo con il primo. In alternativa, su uno tocca **Mostra il mio QR** e sull'altro **Inquadra un QR**.
+3. Da quel momento l'altro telefono compare accanto ai PC: si invia e si accetta come con il PC.
+
+Come con il PC, tutto è cifrato end-to-end e il QR garantisce che le chiavi siano quelle giuste. Un QR vale **una volta sola** per 5 minuti. In **Impostazioni › Altri telefoni** vedi i telefoni abbinati e i loro codici di sicurezza, puoi rimuoverli e puoi spegnere **Visibile agli altri telefoni**.
+- Su **Android**, con *Resta raggiungibile* il telefono riceve anche con l'app chiusa.
+- Su **iPhone** riceve solo con WaveDrop aperto, perché iOS sospende le app in background.
+- L'app web non può fare da server: questa funzione è solo nelle app native.
+
 ### Impostazioni
 - **Profilo:** foto o iniziali colorate, nome, codice di sicurezza.
 - **Ricezione:**
@@ -122,6 +133,10 @@ AirDrop usa Bluetooth LE per farsi trovare, una rete Wi-Fi diretta tra dispositi
   - file a blocchi da 1 MiB cifrati con **ChaCha20-Poly1305** (`/Chunk`). Un blocco alterato interrompe il trasferimento.
 - **Solo contatti:** gli annunci contengono solo un numero casuale e un'etichetta per ciascun contatto. Chi non è un contatto non vede né nome né chiave e non può collegare due annunci tra loro.
 - **Telefono** (`src/core/mobile.js`, `src/web/`): app web servita dal PC, che usa la stessa crittografia in JavaScript.
+- **Da telefono a telefono** (`android/…/net/PeerServer.kt`, `ios/Sources/WaveDropKit/PeerCore.swift`):
+  - ogni app nativa ha un piccolo server HTTP con le stesse richieste cifrate del PC (`/Ask`, `/Chunk`, `/Cancel`);
+  - i telefoni si trovano con **Bonjour** (`_wavedrop._tcp`), che iOS permette alle app senza permessi speciali, a differenza dei pacchetti UDP che usa il PC;
+  - l'abbinamento usa un QR con la chiave pubblica e un segreto monouso, al posto del codice a 6 cifre.
 
 ## E l'AirDrop vero di Apple?
 
@@ -193,6 +208,7 @@ I test (`npm test`) controllano come l'adattatore legge l'output di `omdrop` e d
 - Su Windows non è compatibile con l'AirDrop di Apple (vedi sopra; su Linux c'è il ponte): iPhone e Android usano le app WaveDrop o l'app web.
 - Telefono e PC devono essere sulla stessa rete. L'app web è servita in HTTP sulla rete locale: i file sono cifrati, ma chi controlla la rete potrebbe alterare la pagina scaricata dal telefono. Usala su reti di cui ti fidi; un'app nativa eliminerebbe questo limite.
 - iPhone e Android ricevono solo mentre la pagina di WaveDrop è aperta: iOS sospende le pagine in background.
+- Tra telefoni serve la stessa rete Wi-Fi, e le reti che isolano i dispositivi (Wi-Fi ospiti di alcuni router) bloccano sia Bonjour sia i trasferimenti. I telefoni non si vedono con i PC tramite Bonjour: con il PC si usa sempre il QR di **Collega telefono**.
 - Il Bluetooth serve a *trovare* i dispositivi; i file viaggiano sempre in rete. È disponibile solo su Windows.
 
 ## Ringraziamenti

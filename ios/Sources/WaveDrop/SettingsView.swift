@@ -8,15 +8,45 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var removing: Pc?
+    @State private var removingPhone: Phone?
     @StateObject private var update = UpdateCheck()
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Questo iPhone") {
-                    TextField("Nome visto dai PC", text: $name)
-                        .onSubmit { hub.store.name = name }
+                    TextField("Nome visto dagli altri dispositivi", text: $name)
+                        .onSubmit {
+                            hub.store.name = name
+                            hub.announce()
+                        }
                     LabeledContent("Codice di sicurezza", value: Proto.safetyCode(hub.store.identity.pk))
+                }
+                Section {
+                    Toggle("Visibile agli altri telefoni", isOn: Binding(get: { hub.visibleToPhones }, set: { hub.visibleToPhones = $0 }))
+                    ForEach(hub.phones) { phone in
+                        HStack(spacing: 12) {
+                            AvatarView(name: phone.name, size: 40, online: hub.heard[phone.id] != nil)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(phone.name).font(.body.weight(.semibold))
+                                Text("\(platformLabel(phone.platform)) · codice \(Proto.safetyCode(phone.pkData))").font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("Rimuovi", role: .destructive) { removingPhone = phone }.buttonStyle(.borderless)
+                        }
+                    }
+                    Button("Mostra il mio codice QR") {
+                        dismiss()
+                        // After this sheet has gone, or the QR sheet cannot appear.
+                        Task {
+                            try? await Task.sleep(nanoseconds: 600_000_000)
+                            hub.showQr()
+                        }
+                    }
+                } header: {
+                    Text("Altri telefoni")
+                } footer: {
+                    Text("I telefoni con WaveDrop sulla stessa rete Wi-Fi ti vedono e quelli abbinati possono inviarti file, finché WaveDrop è aperto. Se lo spegni non ti vede nessuno; i PC collegati funzionano comunque.")
                 }
                 Section {
                     ForEach(hub.pcs) { pc in
@@ -34,7 +64,7 @@ struct SettingsView: View {
                 } header: {
                     Text("PC collegati")
                 } footer: {
-                    Text("I file viaggiano cifrati end-to-end (X25519 + ChaCha20-Poly1305): solo questo iPhone e il PC possono leggerli. I codici di sicurezza devono coincidere con quelli nelle Impostazioni di WaveDrop sul PC. iOS sospende le app in background: per ricevere, tieni WaveDrop aperto.")
+                    Text("I file viaggiano cifrati end-to-end (X25519 + ChaCha20-Poly1305): solo questo iPhone e l'altro dispositivo possono leggerli. I codici di sicurezza devono coincidere con quelli mostrati sul PC o sull'altro telefono. iOS sospende le app in background: per ricevere, tieni WaveDrop aperto.")
                 }
                 Section {
                     if update.available, let latest = update.latest {
@@ -77,6 +107,7 @@ struct SettingsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Fine") {
                         hub.store.name = name
+                        hub.announce()
                         dismiss()
                     }
                 }
@@ -91,6 +122,15 @@ struct SettingsView: View {
                 Button("Annulla", role: .cancel) { removing = nil }
             } message: {
                 Text("Per ricollegarlo servirà un nuovo codice QR.")
+            }
+            .alert("Dimenticare \(removingPhone?.name ?? "")?", isPresented: Binding(get: { removingPhone != nil }, set: { if !$0 { removingPhone = nil } })) {
+                Button("Dimentica", role: .destructive) {
+                    if let phone = removingPhone { hub.removePhone(phone) }
+                    removingPhone = nil
+                }
+                Button("Annulla", role: .cancel) { removingPhone = nil }
+            } message: {
+                Text("Per scambiare di nuovo file dovrete riabbinarvi con il codice QR.")
             }
         }
     }
@@ -151,6 +191,7 @@ final class UpdateCheck: ObservableObject {
 }
 
 struct ScannerSheet: View {
+    var title = "Inquadra il codice QR"
     let onCode: (String) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -167,7 +208,7 @@ struct ScannerSheet: View {
                     )
                 }
             }
-            .navigationTitle("Inquadra il QR del PC")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Annulla") { dismiss() } }
@@ -205,7 +246,7 @@ struct QRScanner: UIViewControllerRepresentable {
         func dataScanner(_ scanner: DataScannerViewController, didAdd items: [RecognizedItem], allItems: [RecognizedItem]) {
             guard !done else { return }
             for item in items {
-                if case .barcode(let code) = item, let text = code.payloadStringValue, PairingLink(text) != nil {
+                if case .barcode(let code) = item, let text = code.payloadStringValue, PairingLink(text) != nil || PeerLink(text) != nil {
                     done = true
                     scanner.stopScanning()
                     onCode(text)

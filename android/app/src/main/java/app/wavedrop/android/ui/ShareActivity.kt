@@ -53,7 +53,7 @@ import kotlinx.coroutines.delay
 
 /**
  * The AirDrop-style sheet that opens from Android's "Condividi" menu: pick a
- * paired PC and the shared photos, files or link go straight to it. It stays
+ * paired PC or phone and the shared photos, files or link go straight to it. It stays
  * open until the transfer ends, because the read permission for shared files
  * lasts only as long as this activity.
  */
@@ -125,28 +125,28 @@ private fun ShareSheet(hub: Hub, uris: List<Uri>, text: String?, onClose: () -> 
                 Spacer(Modifier.height(18.dp))
 
                 when {
-                    state.pcs.isEmpty() -> {
-                        Text("Nessun PC collegato. Apri WaveDrop e inquadra il codice QR del tuo PC.", textAlign = TextAlign.Center)
+                    state.targets.isEmpty() -> {
+                        Text("Nessun PC o telefono collegato. Apri WaveDrop e inquadra il codice QR del PC o dell'altro telefono.", textAlign = TextAlign.Center)
                         TextButton(onClick = onOpenApp) { Text("Apri WaveDrop") }
                     }
                     transfer == null -> LazyRow(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-                        items(state.pcs, key = { it.pc.id }) { pcState ->
+                        items(state.targets, key = { it.id }) { target ->
                             Column(
                                 Modifier
                                     .clip(RoundedCornerShape(14.dp))
-                                    .clickable(enabled = pcState.online) {
-                                        transferId = if (uris.isNotEmpty()) hub.sendFiles(pcState.pc.id, uris)
-                                        else text?.let { hub.sendText(pcState.pc.id, it) }
+                                    .clickable(enabled = target.online) {
+                                        transferId = if (uris.isNotEmpty()) hub.sendFiles(target.id, uris)
+                                        else text?.let { hub.sendText(target.id, it) }
                                     }
                                     .padding(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Avatar(pcState.pc.name, 68.dp, online = pcState.online)
-                                Text(pcState.pc.name, fontSize = 13.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 6.dp))
+                                Avatar(target.name, 68.dp, online = target.online)
+                                Text(target.name, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp).width(96.dp), textAlign = TextAlign.Center)
                                 Text(
-                                    if (pcState.online) "Tocca per inviare" else "Non raggiungibile",
+                                    if (target.online) "Tocca per inviare" else "Non raggiungibile",
                                     fontSize = 11.sp,
-                                    color = if (pcState.online) Accent else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = if (target.online) Accent else MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }

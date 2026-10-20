@@ -2,6 +2,7 @@
 
 App nativa SwiftUI, compilata **da Windows** con [xtool](https://xtool.sh) dentro Ubuntu (WSL). È il corrispettivo dell'app Android:
 - collegamento al PC con il codice QR;
+- scambio di file **direttamente con altri telefoni** (iPhone o Android) sulla stessa rete Wi-Fi, abbinandoli con un QR;
 - invio di foto, file e testi;
 - ricezione con salvataggio in **Foto** e in **File › WaveDrop**;
 - cifratura end-to-end.
@@ -17,7 +18,11 @@ ios/
 └── scripts/wsl-build.sh     sincronizza in WSL e lancia xtool
 ```
 
-Il protocollo (`WaveDropKit`) è già verificato. Dentro Ubuntu, `swift test` passa 7 test su 7: riproduce byte per byte chiavi, MAC e blocchi cifrati generati dal PC. L'interfaccia SwiftUI invece si compila solo con l'SDK iOS, che xtool estrae da Xcode.xip. Finché non lo prepari (passi 1–2) non è mai stata compilata, quindi la prima build potrebbe segnalare qualche errore da correggere.
+Il protocollo (`WaveDropKit`) è già verificato. Dentro Ubuntu, `swift test` passa 18 test su 18:
+- riproduce byte per byte chiavi, MAC e blocchi cifrati generati dal PC;
+- prova il server da telefono a telefono (`PeerCore`): abbinamento con il QR, ricezione di file, rifiuto, blocchi alterati, annullamento.
+
+L'interfaccia SwiftUI e la parte di rete (`PeerService.swift`, con Network.framework e Bonjour) invece si compilano solo con l'SDK iOS, che xtool estrae da Xcode.xip. Finché non lo prepari (passi 1–2) non sono mai state compilate, quindi la prima build potrebbe segnalare qualche errore da correggere.
 
 ## Cosa è già pronto in Ubuntu (WSL)
 
@@ -70,6 +75,13 @@ Con un Apple ID gratuito l'app scade dopo **7 giorni**: per rinnovarla basta ril
 1. Sul PC apri WaveDrop e scegli **Collega telefono**.
 2. Nell'app iPhone tocca **Scansiona il codice QR**. Funziona anche inquadrando il QR con la Fotocamera: nella pagina che si apre tocca «Apri il collegamento nell'app».
 3. Invia foto, file o testi. Per ricevere, tieni l'app aperta: iOS sospende le app in background.
+
+Con un altro telefono (iPhone o Android con WaveDrop), sulla stessa rete Wi-Fi:
+1. Nella sezione **Telefoni vicini** tocca **Abbina** accanto all'altro telefono.
+2. Sull'altro tocca **Mostra il codice QR** nella richiesta che compare, e inquadralo.
+3. Da quel momento l'altro telefono compare accanto ai PC.
+
+La prima volta iOS chiede il permesso per la **rete locale**: senza, i telefoni non si vedono. Puoi darlo anche dopo, in Impostazioni › Privacy e sicurezza › Rete locale.
 
 ## Perché non AirDrop vero
 AirDrop usa AWDL, una rete Wi-Fi diretta tra dispositivi Apple, oltre al Bluetooth LE e a certificati firmati da Apple. iOS non permette ad altre app di usarlo. OpenDrop e omdrop-owl lo reimplementano, ma solo su **Linux** con una scheda Wi-Fi in modalità monitor (WaveDrop su Linux ha un ponte verso AirDrop: vedi il README principale). Su Windows, su WSL e dentro un'app Android o iOS non è possibile.

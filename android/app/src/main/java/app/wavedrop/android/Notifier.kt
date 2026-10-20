@@ -20,12 +20,12 @@ object Notifier {
         val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL_OFFERS, "File in arrivo", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Quando un PC vuole inviarti qualcosa"
+                description = "Quando un PC o un telefono vuole inviarti qualcosa"
             },
         )
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL_SERVICE, "Raggiungibile in background", NotificationManager.IMPORTANCE_MIN).apply {
-                description = "Mantiene il collegamento con i PC quando l'app è chiusa"
+                description = "Mantiene il collegamento con i PC e gli altri telefoni quando l'app è chiusa"
             },
         )
     }
@@ -61,7 +61,7 @@ object Notifier {
     fun service(context: Context): Notification = Notification.Builder(context, CHANNEL_SERVICE)
         .setSmallIcon(R.drawable.ic_stat)
         .setContentTitle("WaveDrop è raggiungibile")
-        .setContentText("I tuoi PC possono inviarti file anche con l'app chiusa.")
+        .setContentText("I tuoi PC e telefoni possono inviarti file anche con l'app chiusa.")
         .setContentIntent(openApp(context))
         .setOngoing(true)
         .build()

@@ -1,4 +1,5 @@
 #if os(iOS)
+import CoreImage.CIFilterBuiltins
 import PhotosUI
 import SwiftUI
 import UniformTypeIdentifiers
@@ -10,6 +11,7 @@ struct ContentView: View {
     @EnvironmentObject private var hub: Hub
     @State private var selectedId: String?
     @State private var showScanner = false
+    @State private var scannerTitle = "Inquadra il codice QR"
     @State private var showSettings = false
     @State private var showFiles = false
     @State private var showText = false
@@ -17,28 +19,37 @@ struct ContentView: View {
     @State private var draft = ""
     @State private var photoItems: [PhotosPickerItem] = []
 
-    private var target: Pc? {
-        hub.pcs.first { $0.id == selectedId } ?? hub.pcs.first { hub.online.contains($0.id) } ?? hub.pcs.first
+    private var target: Target? {
+        let all = hub.targets
+        return all.first { $0.id == selectedId } ?? all.first { $0.online } ?? all.first
     }
 
-    private var targetOnline: Bool { target.map { hub.online.contains($0.id) } ?? false }
+    private var targetOnline: Bool { target?.online ?? false }
+
+    private func scan(_ title: String = "Inquadra il codice QR") {
+        scannerTitle = title
+        showScanner = true
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    if hub.pcs.isEmpty {
+                    ForEach(hub.requests) { request in requestCard(request) }
+                    if hub.targets.isEmpty {
                         onboarding
                     } else {
-                        pcsRow
+                        targetsRow
                         actions
                     }
+                    Text("TELEFONI VICINI").font(.footnote).foregroundStyle(.secondary).padding(.top, 10).padding(.leading, 6)
+                    nearbySection
                     if !hub.transfers.isEmpty {
                         Text("TRASFERIMENTI").font(.footnote).foregroundStyle(.secondary).padding(.top, 10).padding(.leading, 6)
                     }
                     ForEach(hub.transfers) { TransferRow(transfer: $0) }
                     if !hub.pcs.isEmpty {
-                        Button("Collega un altro PC") { showScanner = true }.frame(maxWidth: .infinity).padding(.top, 6)
+                        Button("Collega un altro PC o telefono") { scan() }.frame(maxWidth: .infinity).padding(.top, 6)
                     }
                 }
                 .padding()
@@ -51,24 +62,27 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showScanner) {
-                ScannerSheet { code in
+                ScannerSheet(title: scannerTitle) { code in
                     showScanner = false
                     hub.pair(code)
                 }
             }
             .sheet(isPresented: $showSettings) { SettingsView().environmentObject(hub) }
+            .sheet(isPresented: Binding(get: { hub.qr != nil }, set: { if !$0 { hub.hideQr() } })) {
+                if let qr = hub.qr { QrSheet(qr: qr) { hub.hideQr() } }
+            }
             .fileImporter(isPresented: $showFiles, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
-                if case .success(let urls) = result, let pc = target { hub.send(pickedURLs: urls, to: pc) }
+                if case .success(let urls) = result, let target { hub.send(pickedURLs: urls, to: target) }
             }
             .onChange(of: photoItems) { _, items in
-                guard !items.isEmpty, let pc = target else { return }
+                guard !items.isEmpty, let target else { return }
                 photoItems = []
-                Task { await sendPhotos(items, to: pc) }
+                Task { await sendPhotos(items, to: target) }
             }
-            .alert("Invia a \(target?.name ?? "PC")", isPresented: $showText) {
+            .alert("Invia a \(target?.name ?? "")", isPresented: $showText) {
                 TextField("Testo o link", text: $draft)
                 Button("Invia") {
-                    if let pc = target, !draft.trimmingCharacters(in: .whitespaces).isEmpty { hub.send(files: [], text: draft, to: pc) }
+                    if let target, !draft.trimmingCharacters(in: .whitespaces).isEmpty { hub.send(files: [], text: draft, to: target) }
                     draft = ""
                 }
                 Button("Annulla", role: .cancel) { draft = "" }
@@ -90,35 +104,35 @@ struct ContentView: View {
 
     private var onboarding: some View {
         VStack(spacing: 12) {
-            Image(systemName: "desktopcomputer").font(.system(size: 46)).foregroundStyle(accent)
-            Text("Collega il tuo PC").font(.title2.bold())
-            Text("Sul PC apri WaveDrop e scegli «Collega telefono». Poi inquadra il codice QR: iPhone e PC si scambiano le chiavi di cifratura.")
+            Image(systemName: "laptopcomputer.and.iphone").font(.system(size: 46)).foregroundStyle(accent)
+            Text("Collega un PC o un telefono").font(.title2.bold())
+            Text("Sul PC apri WaveDrop e scegli «Collega telefono», poi inquadra il codice QR. Con un altro telefono: su uno tocca «Mostra il mio codice QR», sull'altro inquadralo. I dispositivi si scambiano le chiavi di cifratura.")
                 .multilineTextAlignment(.center).foregroundStyle(.secondary)
             Button {
-                showScanner = true
+                scan()
             } label: {
                 Label("Scansiona il codice QR", systemImage: "qrcode.viewfinder").frame(maxWidth: .infinity).padding(.vertical, 6)
             }
             .buttonStyle(.borderedProminent)
-            Button("Oppure incolla il link") { showPaste = true }
+            Button("Mostra il mio codice QR") { hub.showQr() }
+            Button("Oppure incolla il link del PC") { showPaste = true }
         }
         .padding(22)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private var pcsRow: some View {
+    private var targetsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 14) {
-                ForEach(hub.pcs) { pc in
-                    let online = hub.online.contains(pc.id)
+                ForEach(hub.targets) { t in
                     Button {
-                        selectedId = pc.id
+                        selectedId = t.id
                     } label: {
                         VStack(spacing: 4) {
-                            AvatarView(name: pc.name, size: 72, online: online, selected: pc.id == target?.id)
-                            Text(pc.name).font(.footnote.weight(.medium)).lineLimit(1).foregroundStyle(.primary)
-                            Text(online ? "Connesso" : "Non raggiungibile").font(.caption2)
-                                .foregroundStyle(online ? .green : .secondary)
+                            AvatarView(name: t.name, size: 72, online: t.online, selected: t.id == target?.id)
+                            Text(t.name).font(.footnote.weight(.medium)).lineLimit(1).foregroundStyle(.primary)
+                            Text(!t.online ? "Non raggiungibile" : t.isPhone ? platformLabel(t.platform) : "Connesso").font(.caption2)
+                                .foregroundStyle(t.online ? .green : .secondary)
                         }
                         .frame(width: 96)
                     }
@@ -141,11 +155,62 @@ struct ContentView: View {
                     .disabled(!targetOnline)
             }
             .buttonStyle(.plain)
-            if let pc = target, !targetOnline {
-                Text("\(pc.name) non è raggiungibile: apri WaveDrop sul PC e collegati alla stessa rete Wi-Fi.")
+            if let target, !targetOnline {
+                Text(target.isPhone
+                    ? "\(target.name) non è raggiungibile: apri WaveDrop sull'altro telefono, sulla stessa rete Wi-Fi."
+                    : "\(target.name) non è raggiungibile: apri WaveDrop sul PC e collegati alla stessa rete Wi-Fi.")
                     .font(.footnote).foregroundStyle(.secondary).padding(.leading, 4)
             }
         }
+    }
+
+    private var nearbySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if hub.nearby.isEmpty {
+                Text("Nessun altro telefono con WaveDrop su questa rete Wi-Fi. Aprilo sull'altro telefono, oppure abbinatevi con il codice QR.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            ForEach(hub.nearby) { phone in
+                HStack(spacing: 12) {
+                    AvatarView(name: phone.name, size: 40)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(phone.name).font(.body.weight(.semibold)).lineLimit(1)
+                        Text("\(platformLabel(phone.platform)) · non abbinato").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Abbina") {
+                        hub.requestPair(phone)
+                        scan("Inquadra il QR comparso su \(phone.name)")
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+            HStack {
+                Button("Mostra il mio QR") { hub.showQr() }.buttonStyle(.bordered)
+                Button("Inquadra un QR") { scan() }.buttonStyle(.bordered)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func requestCard(_ request: PairRequest) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                AvatarView(name: request.name, size: 44)
+                Text("\(request.name) (\(platformLabel(request.platform))) vuole abbinarsi con questo iPhone.").font(.subheadline)
+            }
+            HStack {
+                Button { hub.dismissRequest(request.id) } label: { Text("Ignora").frame(maxWidth: .infinity) }.buttonStyle(.bordered)
+                Button {
+                    hub.dismissRequest(request.id)
+                    hub.showQr()
+                } label: { Text("Mostra il codice QR").frame(maxWidth: .infinity) }.buttonStyle(.borderedProminent)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 
     @ViewBuilder private var banner: some View {
@@ -162,7 +227,7 @@ struct ContentView: View {
         }
     }
 
-    private func sendPhotos(_ items: [PhotosPickerItem], to pc: Pc) async {
+    private func sendPhotos(_ items: [PhotosPickerItem], to target: Target) async {
         var files: [OutgoingFile] = []
         for item in items {
             guard let picked = try? await item.loadTransferable(type: PickedMedia.self) else { continue }
@@ -173,8 +238,59 @@ struct ContentView: View {
         if files.isEmpty {
             hub.banner = "Impossibile leggere gli elementi scelti"
         } else {
-            hub.send(files: files, text: nil, to: pc)
+            hub.send(files: files, text: nil, to: target)
         }
+    }
+}
+
+/// This iPhone's pairing QR, for another phone to scan.
+struct QrSheet: View {
+    let qr: ShownQr
+    let onClose: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 18) {
+                Group {
+                    if qr.pairedWith != nil {
+                        Image(systemName: "checkmark.circle.fill").font(.system(size: 96)).foregroundStyle(.green)
+                    } else if let image = Self.image(for: qr.text) {
+                        Image(uiImage: image).interpolation(.none).resizable().scaledToFit()
+                    }
+                }
+                .frame(width: 240, height: 240)
+                .padding(12)
+                .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
+                Text("Sull'altro telefono apri WaveDrop e tocca «Inquadra un QR». I due telefoni si scambiano le chiavi di cifratura e da quel momento si riconoscono.")
+                    .multilineTextAlignment(.center).foregroundStyle(.secondary).font(.subheadline)
+                if qr.pairedWith == nil {
+                    TimelineView(.periodic(from: .now, by: 1)) { context in
+                        let left = max(0, Int(qr.expires.timeIntervalSince(context.date)))
+                        Text(left > 0 ? "Valido ancora \(left / 60):\(String(format: "%02d", left % 60)), una sola volta" : "Scaduto: chiudi e mostrane uno nuovo")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(24)
+            .navigationTitle(qr.pairedWith.map { "Abbinato con \($0) ✓" } ?? "Il mio codice QR")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Chiudi", action: onClose) } }
+            .task(id: qr.pairedWith) {
+                guard qr.pairedWith != nil else { return }
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                onClose()
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    static func image(for text: String) -> UIImage? {
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(text.utf8)
+        filter.correctionLevel = "M"
+        guard let output = filter.outputImage?.transformed(by: CGAffineTransform(scaleX: 10, y: 10)),
+              let cg = CIContext().createCGImage(output, from: output.extent) else { return nil }
+        return UIImage(cgImage: cg)
     }
 }
 

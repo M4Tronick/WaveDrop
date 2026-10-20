@@ -33,12 +33,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- wavedrop://pair?u=<QR link>, used by the PC's web page "Apri nell'app" -->
+            <!-- wavedrop://pair?u=<QR link>, used by the PC's web page "Apri nell'app";
+                 wavedrop://peer?…, another phone's QR read with the camera app. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="wavedrop" android:host="pair" />
+                <data android:scheme="wavedrop" android:host="peer" />
             </intent-filter>
         </activity>
 
