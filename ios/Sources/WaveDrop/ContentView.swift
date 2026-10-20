@@ -2,6 +2,11 @@
 import CoreImage.CIFilterBuiltins
 import PhotosUI
 import SwiftUI
+// PhotosPicker lives in this cross-import overlay, which Xcode loads by itself
+// and SwiftPM (xtool) does not.
+#if canImport(_PhotosUI_SwiftUI)
+import _PhotosUI_SwiftUI
+#endif
 import UniformTypeIdentifiers
 import WaveDropKit
 

@@ -22,7 +22,7 @@ Il protocollo (`WaveDropKit`) è già verificato. Dentro Ubuntu, `swift test` pa
 - riproduce byte per byte chiavi, MAC e blocchi cifrati generati dal PC;
 - prova il server da telefono a telefono (`PeerCore`): abbinamento con il QR, ricezione di file, rifiuto, blocchi alterati, annullamento.
 
-L'interfaccia SwiftUI e la parte di rete (`PeerService.swift`, con Network.framework e Bonjour) invece si compilano solo con l'SDK iOS, che xtool estrae da Xcode.xip. Finché non lo prepari (passi 1–2) non sono mai state compilate, quindi la prima build potrebbe segnalare qualche errore da correggere.
+L'interfaccia SwiftUI e la parte di rete (`PeerService.swift`, con Network.framework e Bonjour) invece si compilano solo con l'SDK iOS, che xtool estrae da Xcode.xip. Con l'SDK di Xcode 27.2 l'app si compila (`xtool dev build`, senza firma), ma non è ancora stata installata né provata su un iPhone.
 
 ## Cosa è già pronto in Ubuntu (WSL)
 
