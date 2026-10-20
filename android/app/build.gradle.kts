@@ -13,8 +13,8 @@ android {
         applicationId = "app.wavedrop.android"
         minSdk = 29
         targetSdk = 36
-        versionCode = (findProperty("wdVersionCode") as String?)?.toInt() ?: 4
-        versionName = (findProperty("wdVersionName") as String?) ?: "1.0.3"
+        versionCode = (findProperty("wdVersionCode") as String?)?.toInt() ?: 5
+        versionName = (findProperty("wdVersionName") as String?) ?: "1.1.0"
     }
 
     buildTypes {
